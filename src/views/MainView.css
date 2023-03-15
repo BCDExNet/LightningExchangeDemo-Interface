@@ -1,0 +1,37 @@
+.appContainer {
+	display: flex;
+	flex-direction: column;
+}
+
+.mainViewLayout {
+	padding: 1em;
+	margin-top: 2em;
+	width: 480px;
+	background-color: #0a1e67;
+	border-radius: 1em;
+}
+
+.mainViewLayout .subViewLayout {
+	/*  */
+}
+
+.mainViewLayout .orderItem {
+	width: calc(100% - 2em);
+	padding: 1em;
+	border: 1px dotted gainsboro;
+	border-radius: 1em;
+	display: flex;
+	flex-direction: column;
+	row-gap: 0.5em;
+}
+
+.mainViewLayout .orderItem div {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.mainViewLayout .orderItem div .value {
+	font-size: x-small;
+}

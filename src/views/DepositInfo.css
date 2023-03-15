@@ -1,0 +1,23 @@
+.depositInfoLayout {
+	padding: 1em;
+	margin-top: 2em;
+	width: 480px;
+	background-color: #0a1e67;
+	border-radius: 1em;
+	display: flex;
+	flex-direction: column;
+	row-gap: 1em;
+}
+
+.depositInfoLayout .item {
+	display: flex;
+	width: 100%;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.depositInfoLayout .item span:first-child {
+	font-weight: bold;
+	color: white;
+}

@@ -1,0 +1,16 @@
+.tabLayout {
+	display: flex;
+	flex-direction: row;
+	column-gap: 1em;
+}
+
+.tabLayout .option input {
+	display: none;
+}
+
+.tabLayout .option label {
+	color: white;
+	font-weight: bold;
+	text-transform: uppercase;
+	cursor: pointer;
+}

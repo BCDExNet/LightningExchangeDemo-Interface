@@ -1,23 +1,36 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
+import { appController } from './libs/appController';
+import { DepositInfo } from './views/DepositInfo';
+import { Header } from './views/Header';
+import { MainView } from './views/MainView';
 
 function App() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const init = async () => {
+      await appController.init();
+      const d = await appController.getData();
+      setData(d);
+    };
+
+    init();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header />
+
+      <div className='appView'>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<MainView data={data} />} />
+            <Route path='/deposit/:secret' element={<DepositInfo />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
     </div>
   );
 }
