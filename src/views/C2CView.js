@@ -33,7 +33,7 @@ export const C2CView = ({ data = null }) => {
 			const decoded = invoiceDecoder.decode(val);
 			setBTCAmount(decoded.amount);
 			setExpiry(decoded.timeStamp + decoded.expiry + 3600);
-			setSecretHash("0x" + decoded.paymentSecret);
+			setSecretHash("0x" + decoded.paymentHash);
 			setInvoice(val);
 		} catch (error) {
 			console.error(error);
