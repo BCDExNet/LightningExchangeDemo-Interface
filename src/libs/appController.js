@@ -9,7 +9,7 @@ export const appController = {
 			abi: "/abis/erc20.json"
 		},
 		safeBox: {
-			address: "0xF9d39995e4FFa88A93aE56996bB4e3e9F9923AbB",
+			address: "0xdEF092bC601cEcccAd596268b841B42306273970",
 			abi: "/abis/safe_box.json"
 		}
 	},
