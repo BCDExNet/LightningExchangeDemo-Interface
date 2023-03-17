@@ -5,6 +5,7 @@ export const appController = {
 	_config: {
 		b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 		price: 24969.0668,
+		priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin",
 		"USDC": {
 			address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
 			abi: "/abis/erc20.json"
@@ -26,7 +27,14 @@ export const appController = {
 		this._account = web3Controller.account;
 	},
 
+	_updatePrice: async function () {
+		const result = await (await fetch(this._config.priceApi)).json();
+		this._config.price = result[0].current_price / result[1].current_price;
+	},
+
 	getData: async function () {
+		await this._updatePrice();
+
 		const erc20Abi = await this._loadJson(this._config.USDC.abi);
 		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
 		let i = 0;
