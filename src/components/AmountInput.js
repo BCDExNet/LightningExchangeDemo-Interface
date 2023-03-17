@@ -6,17 +6,26 @@ export const AmountInput = ({
 	balance = 0,
 	symbol = "",
 	tokenName = "",
-	onChange = () => { }
+	onChange = () => { },
+	min = 1,
+	max = 0
 }) => {
-	const [value, setValue] = useState(0);
+	const maxValue = max > 0 ? Math.min(max, balance) : balance;
+	const [value, setValue] = useState(min);
+	const [previousValue, setPreviousValue] = useState(min);
 
 	const handleChange = event => {
 		const val = Number(event.currentTarget.value);
+		setValue(val);
 
-		if (!isNaN(val) && val <= balance) {
-			setValue(val);
-			onChange(val);
-		}
+		setTimeout(() => {
+			if (!isNaN(val) && val <= maxValue && val >= min) {
+				onChange(val);
+				setPreviousValue(val);
+			} else {
+				setValue(previousValue);
+			}
+		}, 1000);
 	};
 
 	const handleMax = event => {
@@ -43,7 +52,9 @@ export const AmountInput = ({
 				type="number"
 				onChange={handleChange}
 				placeholder={0}
-				value={value} />
+				value={value}
+				min={min}
+				max={maxValue} />
 		</div>
 	</div>
 };

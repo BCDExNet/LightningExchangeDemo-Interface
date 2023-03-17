@@ -8,9 +8,9 @@ import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./MainView.css";
 
 export const B2CView = ({ data = null }) => {
+	const taker = appController.config.b2cTaker;
 	const [usdcAmount, setUSDCAmount] = useState(BigNumber(0));
 	const [btcValue, setBtcValue] = useState(BigNumber(0));
-	const [taker, setTaker] = useState("");
 	const [invoice, setInvoice] = useState("");
 	const [btcAmount, setBTCAmount] = useState(0);
 	const [expiry, setExpiry] = useState(0);
@@ -21,17 +21,17 @@ export const B2CView = ({ data = null }) => {
 		setBtcValue(appController.computeBTCWithUSDC(val));
 	};
 
-	const handleChangeTaker = val => {
-		setTaker(val);
-	};
-
 	const handleChangeInvoice = val => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
-			setBTCAmount(decoded.amount);
-			setExpiry(decoded.timeStamp + decoded.expiry + 3600);
-			setSecretHash("0x" + decoded.paymentHash);
-			setInvoice(val);
+			if (decoded.amount > 0) {
+				setBTCAmount(decoded.amount);
+				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
+				setSecretHash("0x" + decoded.paymentHash);
+				setInvoice(val);
+			} else {
+				window.alert("Amount is 0.");
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -63,23 +63,20 @@ export const B2CView = ({ data = null }) => {
 			balance={data?.usdcBalance?.shiftedBy(-6).toNumber()}
 			symbol="USDC"
 			tokenName="USD Coin"
-			onChange={handleChange} />
+			onChange={handleChange}
+			max={10} />
 
 		<AmountLabel
 			title="You Buy"
 			symbol="LN BTC"
 			tokenName="Wrapped BTC"
-			value={btcValue.toFixed()} />
-
-		<StringInput
-			title="Taker Address"
-			onChange={handleChangeTaker}
-			placeholder="0x..." />
+			value={btcValue.toFixed(0) + " SATs"} />
 
 		<StringInput
 			title="LN Invoice"
 			onChange={handleChangeInvoice}
-			placeholder="lnbc1..." />
+			placeholder="lnbc1..."
+			qr={true} />
 
 		{data?.allowance?.lt(usdcAmount) ? <button
 			className="fullwidthButton"

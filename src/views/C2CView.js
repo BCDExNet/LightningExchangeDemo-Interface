@@ -75,7 +75,7 @@ export const C2CView = ({ data = null }) => {
 			title="You Buy"
 			symbol="LN BTC"
 			tokenName="Wrapped BTC"
-			value={btcValue.toFixed()} />
+			value={btcValue.toFixed(0) + " SATs"} />
 
 		<PriceControl
 			title="USDC per WBTC (+1.17%)"
@@ -90,7 +90,8 @@ export const C2CView = ({ data = null }) => {
 		<StringInput
 			title="LN Invoice"
 			onChange={handleChangeInvoice}
-			placeholder="lnbc1..." />
+			placeholder="lnbc1..."
+			qr={true} />
 
 		{data?.allowance?.lt(usdcAmount) ? <button
 			className="fullwidthButton"

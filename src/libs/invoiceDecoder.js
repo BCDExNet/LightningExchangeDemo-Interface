@@ -226,7 +226,7 @@ export const invoiceDecoder = {
 		let amount = this._decodeAmount(humanReadablePart.substring(prefix.length, humanReadablePart.length));
 		return {
 			'prefix': prefix,
-			'amount': amount
+			'amount': (typeof amount) === "string" ? 0 : amount
 		}
 	},
 

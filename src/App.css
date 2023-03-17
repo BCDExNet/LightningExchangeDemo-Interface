@@ -11,6 +11,20 @@
   align-items: center;
 }
 
+.tinyButton {
+  padding: 0.25em 0.5em;
+  text-transform: uppercase;
+  color: white;
+  font-weight: bolder;
+  background-color: #133981;
+  border: none;
+  outline: none;
+  border-radius: 5px;
+  width: fit-content;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 .smallButton {
   padding: 0.8em 1.5em;
   text-transform: uppercase;
