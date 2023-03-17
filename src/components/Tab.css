@@ -9,8 +9,11 @@
 }
 
 .tabLayout .option label {
-	color: white;
-	font-weight: bold;
 	text-transform: uppercase;
 	cursor: pointer;
+}
+
+.tabLayout .option input:checked+label {
+	font-weight: bolder;
+	color: white;
 }

@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 
 export const appController = {
 	_config: {
+		b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 		price: 24969.0668,
 		"USDC": {
 			address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
@@ -12,6 +13,9 @@ export const appController = {
 			address: "0xdEF092bC601cEcccAd596268b841B42306273970",
 			abi: "/abis/safe_box.json"
 		}
+	},
+	get config() {
+		return this._config;
 	},
 
 	_data: null,
@@ -31,10 +35,18 @@ export const appController = {
 
 		const usdcBalance = await web3Controller.callContract(this._config.USDC.address, erc20Abi, "balanceOf", this._account);
 
-		const howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
 		const orders = [];
+
+		let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
 		while (i < howManyOrder) {
 			orders.push(await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashByIndex", this._account, i));
+			i++;
+		}
+
+		i = 0;
+		howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashLength", this._account);
+		while (i < howManyOrder) {
+			orders.push(await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i));
 			i++;
 		}
 
@@ -46,7 +58,7 @@ export const appController = {
 	},
 
 	computeBTCWithUSDC: function (usdcAmount) {
-		return BigNumber(usdcAmount).dividedBy(this._config.price);
+		return BigNumber(usdcAmount).dividedBy(this._config.price).multipliedBy(100000000);
 	},
 
 	getBTCPrice: function () {

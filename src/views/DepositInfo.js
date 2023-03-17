@@ -68,21 +68,21 @@ export const DepositInfo = () => {
 				<span>Amount:</span>
 				<span>{data.amount}</span>
 			</div>
+		</>}
 
-			<div style={{ textAlign: "center" }}>
-				<canvas id="qr" />
-			</div>
+		<div style={{ textAlign: "center" }}>
+			<canvas id="qr" />
+		</div>
 
-			{!data.withdrawn && <>
-				<StringInput
-					title="preimage/secret"
-					onChange={handleChangePreimage}
-					placeholder="0x..." />
+		{!(data?.withdrawn) && <>
+			<StringInput
+				title="preimage/secret"
+				onChange={handleChangePreimage}
+				placeholder="0x..." />
 
-				<button
-					className="fullwidthButton"
-					onClick={handleWithdraw}>Withdraw</button>
-			</>}
+			<button
+				className="fullwidthButton"
+				onClick={handleWithdraw}>Withdraw</button>
 		</>}
 	</div>
 };

@@ -8,6 +8,19 @@
 	flex-direction: column;
 }
 
+.amountInputLayout .scanner {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 200px;
+	height: 200px;
+}
+
+.amountInputLayout .scanner #scanner {
+	width: 200px;
+	height: 200px;
+}
+
 .amountInputLayout .line {
 	display: flex;
 	flex-direction: row;
@@ -39,6 +52,10 @@
 	text-align: right;
 	font-size: x-large;
 	appearance: textfield;
+}
+
+.amountInputLayout .titleBar .numberInput::-webkit-inner-spin-button {
+	appearance: none;
 }
 
 .amountInputLayout .titleBar .stringInput {
