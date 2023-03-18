@@ -2,6 +2,8 @@ import QrScanner from "qr-scanner";
 import { useEffect, useState } from "react";
 import "./AmountInput.css";
 
+let qrScanner = null;
+
 export const StringInput = ({
 	title = "",
 	onChange = () => { },
@@ -27,7 +29,12 @@ export const StringInput = ({
 	useEffect(() => {
 		if (isShowQR) {
 			setTimeout(() => {
-				const qrScanner = new QrScanner(
+				if (qrScanner) {
+					qrScanner.stop();
+					qrScanner = null;
+				}
+
+				qrScanner = new QrScanner(
 					document.getElementById("scanner"),
 					result => {
 						setValue(result);
@@ -41,6 +48,14 @@ export const StringInput = ({
 			}, 1000);
 		}
 	}, [isShowQR]);
+
+	const handleCloseScanner = event => {
+		if (qrScanner) {
+			qrScanner.stop();
+			qrScanner = null;
+			setIsShowQR(false);
+		}
+	};
 
 	return <div className="amountInputLayout">
 		<div className="titleBar">
@@ -63,6 +78,10 @@ export const StringInput = ({
 
 		{isShowQR && <div className="scanner">
 			<video id="scanner" />
+
+			<button
+				className="fullwidthButton"
+				onClick={handleCloseScanner}>Close</button>
 		</div>}
 	</div>
 };
