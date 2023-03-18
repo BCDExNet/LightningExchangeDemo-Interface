@@ -29,8 +29,8 @@ export const B2CView = ({ data = null }) => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
-				setBTCAmount(decoded.amount);
-				setUSDCAmount(appController.computeUSDCWithBTC(decoded.amount));
+				setBTCAmount(decoded.amount/1000);
+				setUSDCAmount(appController.computeUSDCWithBTC(decoded.amount/1000));
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
