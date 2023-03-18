@@ -4,7 +4,8 @@ export const AmountLabel = ({
 	title = "",
 	symbol = "",
 	tokenName = "",
-	value = 0
+	value = 0,
+	deficit = false
 }) => {
 	return <div className="amountInputLayout">
 		<div className="titleBar">
@@ -14,7 +15,7 @@ export const AmountLabel = ({
 		<div className="titleBar">
 			<div>{symbol}</div>
 
-			<div>{value}</div>
+			<div style={{ color: deficit ? "red" : "" }}>{value}</div>
 		</div>
 	</div>
 };

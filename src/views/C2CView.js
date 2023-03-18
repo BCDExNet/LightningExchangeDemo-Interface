@@ -1,6 +1,5 @@
 import BigNumber from "bignumber.js";
-import { BN } from "bn.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AmountInput } from "../components/AmountInput";
 import { AmountLabel } from "../components/AmountLabel";
 import { PriceControl } from "../components/PriceControl";
@@ -18,6 +17,10 @@ export const C2CView = ({ data = null }) => {
 	const [secretHash, setSecretHash] = useState("");
 	const [invoice, setInvoice] = useState("");
 	const [price, setPrice] = useState(appController.getBTCPrice());
+
+	useEffect(() => {
+		setBtcValue(appController.computeBTCWithUSDC(1));
+	}, [data?.updated]);
 
 	const handleChange = val => {
 		setUSDCAmount(BigNumber(val).shiftedBy(6));
@@ -37,6 +40,10 @@ export const C2CView = ({ data = null }) => {
 			setInvoice(val);
 		} catch (error) {
 			console.error(error);
+
+			setBTCAmount(0);
+			setExpiry(0);
+			setSecretHash("");
 		}
 	};
 
@@ -59,7 +66,7 @@ export const C2CView = ({ data = null }) => {
 
 	const handleApprove = () => {
 		appController.approve(() => {
-			window.location.reload();
+			// window.location.reload();
 		});
 	};
 

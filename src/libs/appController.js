@@ -28,8 +28,12 @@ export const appController = {
 	},
 
 	_updatePrice: async function () {
-		const result = await (await fetch(this._config.priceApi)).json();
-		this._config.price = result[0].current_price / result[1].current_price;
+		try {
+			const result = await (await fetch(this._config.priceApi)).json();
+			this._config.price = result[0].current_price / result[1].current_price;
+		} catch (error) {
+			console.error(error)
+		}
 	},
 
 	getData: async function () {
@@ -67,6 +71,10 @@ export const appController = {
 
 	computeBTCWithUSDC: function (usdcAmount) {
 		return BigNumber(usdcAmount).dividedBy(this._config.price).multipliedBy(100000000);
+	},
+
+	computeUSDCWithBTC: function (satAmount) {
+		return BigNumber(satAmount).dividedBy(100000000).multipliedBy(this._config.price).shiftedBy(6).integerValue();
 	},
 
 	getBTCPrice: function () {

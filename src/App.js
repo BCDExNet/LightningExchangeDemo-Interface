@@ -6,14 +6,36 @@ import { DepositInfo } from './views/DepositInfo';
 import { Header } from './views/Header';
 import { MainView } from './views/MainView';
 
+let updatingTimer = null;
+let isFetching = false;
+
 function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
+    const updateData = async () => {
+      if (!isFetching) {
+        isFetching = true;
+        const d = await appController.getData();
+        d.updated = new Date().getTime();
+        setData(d);
+        isFetching = false;
+      }
+    };
+
     const init = async () => {
+      if (updatingTimer) {
+        window.clearInterval(updatingTimer);
+        updatingTimer = null;
+      }
+
       await appController.init();
-      const d = await appController.getData();
-      setData(d);
+
+      updatingTimer = setInterval(async () => {
+        await updateData();
+      }, 10000);
+
+      await updateData();
     };
 
     init();
