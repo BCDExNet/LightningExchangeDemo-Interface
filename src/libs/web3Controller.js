@@ -1,20 +1,57 @@
 import Web3 from "web3";
+import { appConfig } from "../configs/appConfig";
+import { globalUtils } from "../libs/globalUtils";
 
 export const web3Controller = {
 	_web3: null,
 	_contracts: {},
+	_updateWeb3Func: () => { },
 
 	account: "",
 	chainId: 0,
 
-	connect: async function () {
+	connect: async function (updateWeb3Func) {
+		this._updateWeb3Func = updateWeb3Func;
+
 		if (window.ethereum) {
+			window.ethereum.on("chainChanged", this._onChainChanged);
+			window.ethereum.on("accountsChanged", this._onAccountsChanges);
+
 			this._web3 = new Web3(window.ethereum);
 
 			const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
 			this.account = accounts[0];
 
-			this.chainId = this._web3.currentProvider.chainId;
+			this.chainId = parseInt(this._web3.currentProvider.chainId, 16);
+		}
+	},
+
+	switchNetwork: async function (indexOfNetwork) {
+		const theChainConfig = Object.values(appConfig.networks)[indexOfNetwork];
+		const cid = "0x" + theChainConfig.chainId.toString(16);
+
+		try {
+			await this._web3.currentProvider.request({
+				method: globalUtils.constants.WALLET_SWITCH_ETHEREUM_CHAIN,
+				params: [{ chainId: cid }],
+			});
+		} catch (switchError) {
+			if (switchError.code === 4902) {
+				try {
+					await this._web3.currentProvider.request({
+						method: globalUtils.constants.WALLET_ADD_ETHEREUM_CHAIN,
+						params: [{
+							...theChainConfig,
+							chainId: cid
+						},
+						],
+					});
+				} catch (addError) {
+					console.error(addError);
+				}
+			} else {
+				console.error(switchError);
+			}
 		}
 	},
 
@@ -45,5 +82,15 @@ export const web3Controller = {
 		}
 
 		return this._contracts[address];
+	},
+
+	_onChainChanged: function (chainIdArg) {
+		web3Controller.chainId = parseInt(chainIdArg, 16);
+		return web3Controller._updateWeb3Func({ chainId: web3Controller.chainId });
+	},
+
+	_onAccountsChanges: function (accounts) {
+		web3Controller.account = accounts[0];
+		return web3Controller._updateWeb3Func({ accounts });
 	}
 };

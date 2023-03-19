@@ -19,12 +19,30 @@ export const appController = {
 		return this._config;
 	},
 
-	_data: null,
 	_account: "",
+	get account() {
+		return this._account;
+	},
 
-	init: async function () {
-		await web3Controller.connect();
+	_chainId: 0,
+	get chainId() {
+		return this._chainId;
+	},
+
+	_data: null,
+
+	init: async function (updateWeb3Func) {
+		await web3Controller.connect(eventObject => {
+			this._getWeb3Context();
+			updateWeb3Func(eventObject);
+		});
+
+		this._getWeb3Context();
+	},
+
+	_getWeb3Context: function () {
 		this._account = web3Controller.account;
+		this._chainId = web3Controller.chainId;
 	},
 
 	_updatePrice: async function () {
@@ -144,6 +162,10 @@ export const appController = {
 			secret
 		);
 		return result;
+	},
+
+	switchNetwork: function (indexOfNetwork) {
+		web3Controller.switchNetwork(indexOfNetwork);
 	},
 
 	_loadJson: async function (url) {

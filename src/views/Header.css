@@ -1,11 +1,23 @@
 .headerLayout {
 	display: flex;
 	flex-direction: row;
-	column-gap: 1em;
 	align-items: center;
+	justify-content: space-between;
 }
 
-.headerLayout a {
+.headerLayout .menu {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	column-gap: 1.5em;
+}
+
+.headerLayout .menu a {
 	text-transform: uppercase;
 
+}
+
+.headerLayout .menu .label {
+	font-size: 1em;
 }

@@ -12,28 +12,47 @@ let isFetching = false;
 function App() {
   const [data, setData] = useState(null);
 
+  const updateData = async () => {
+    if (!isFetching) {
+      isFetching = true;
+      const d = await appController.getData();
+      d.updated = new Date().getTime();
+      d.account = appController.account;
+      d.chainId = appController.chainId;
+      setData(d);
+      isFetching = false;
+    }
+  };
+
+  console.debug("data =", data);
+
+  const turnTimerOff = () => {
+    if (updatingTimer) {
+      window.clearInterval(updatingTimer);
+      updatingTimer = null;
+    }
+  };
+
+  const turnTimerOn = () => {
+    updatingTimer = setInterval(async () => {
+      await updateData();
+    }, 10000);
+  };
+
+  const updateWeb3 = eventObject => {
+    console.debug("更新web3环境", eventObject);
+
+    turnTimerOff();
+    turnTimerOn()
+  };
+
   useEffect(() => {
-    const updateData = async () => {
-      if (!isFetching) {
-        isFetching = true;
-        const d = await appController.getData();
-        d.updated = new Date().getTime();
-        setData(d);
-        isFetching = false;
-      }
-    };
-
     const init = async () => {
-      if (updatingTimer) {
-        window.clearInterval(updatingTimer);
-        updatingTimer = null;
-      }
+      turnTimerOff();
 
-      await appController.init();
+      await appController.init(updateWeb3);
 
-      updatingTimer = setInterval(async () => {
-        await updateData();
-      }, 10000);
+      turnTimerOn();
 
       await updateData();
     };
@@ -43,7 +62,9 @@ function App() {
 
   return (
     <div className="App">
-      <Header />
+      <Header
+        account={data?.account}
+        chainId={data?.chainId} />
 
       <div className='appView'>
         <BrowserRouter>
