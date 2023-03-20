@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { AmountLabel } from "../components/AmountLabel";
 import { StringInput } from "../components/StringInput";
 import { appController } from "../libs/appController";
+import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./MainView.css";
 
 export const B2CView = ({ data = null }) => {
 	const taker = appController.config.b2cTaker;
-	const [usdcAmount, setUSDCAmount] = useState(BigNumber(0));
-	// const [btcValue, setBtcValue] = useState(BigNumber(0));
+	const [usdcAmount, setUSDCAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
+	// const [btcValue, setBtcValue] = useState(globalUtils.constants.BIGNUMBER_ZERO);
 	const [invoice, setInvoice] = useState("");
 	const [btcAmount, setBTCAmount] = useState(0);
 	const [expiry, setExpiry] = useState(0);
@@ -29,8 +30,9 @@ export const B2CView = ({ data = null }) => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
-				setBTCAmount(decoded.amount/1000);
-				setUSDCAmount(appController.computeUSDCWithBTC(decoded.amount/1000));
+				const sats = decoded.amount / 1000;
+				setBTCAmount(sats);
+				setUSDCAmount(appController.computeUSDCWithBTC(sats));
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
@@ -38,7 +40,7 @@ export const B2CView = ({ data = null }) => {
 				window.alert("Amount is 0.");
 
 				setBTCAmount(0);
-				setUSDCAmount(BigNumber(0));
+				setUSDCAmount(globalUtils.constants.BIGNUMBER_ZERO);
 				setExpiry(0);
 				setSecretHash("");
 			}

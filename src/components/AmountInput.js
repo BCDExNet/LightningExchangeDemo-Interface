@@ -1,18 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AmountInput.css";
 
 export const AmountInput = ({
 	title = "",
 	balance = 0,
+	showMax = true,
 	symbol = "",
 	tokenName = "",
 	onChange = () => { },
 	min = 1,
-	max = 0
+	max = 0,
+	valueForced = 0,
+	deficit = false
 }) => {
 	const maxValue = max > 0 ? Math.min(max, balance) : balance;
 	const [value, setValue] = useState(min);
 	const [previousValue, setPreviousValue] = useState(min);
+
+	useEffect(() => {
+		if (valueForced > 0) {
+			setValue(valueForced)
+		}
+	}, [valueForced]);
 
 	const handleChange = event => {
 		const val = Number(event.currentTarget.value);
@@ -37,11 +46,11 @@ export const AmountInput = ({
 		<div className="titleBar">
 			<div className="title">{title}</div>
 
-			<div>
+			{showMax > 0 && <div>
 				<span>Balance: {balance}&nbsp;</span>
 
 				<button onClick={handleMax}>MAX</button>
-			</div>
+			</div>}
 		</div>
 
 		<div className="titleBar">
@@ -54,7 +63,8 @@ export const AmountInput = ({
 				placeholder={0}
 				value={value}
 				min={min}
-				max={maxValue} />
+				max={maxValue}
+				style={{ color: deficit ? "red" : "white" }} />
 		</div>
 	</div>
 };

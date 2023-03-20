@@ -34,5 +34,6 @@ export const appConfig = {
 			],
 			iconUrls: []
 		}
-	}
+	},
+	updateDurationMS: 600000
 };

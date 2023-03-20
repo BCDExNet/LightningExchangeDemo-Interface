@@ -24,8 +24,6 @@ function App() {
     }
   };
 
-  console.debug("data =", data);
-
   const turnTimerOff = () => {
     if (updatingTimer) {
       window.clearInterval(updatingTimer);

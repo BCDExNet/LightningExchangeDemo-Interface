@@ -1,5 +1,7 @@
 import { web3Controller } from "./web3Controller";
 import BigNumber from "bignumber.js";
+import { globalUtils } from "./globalUtils";
+import { appConfig } from "../configs/appConfig";
 
 export const appController = {
 	_config: {
@@ -45,17 +47,40 @@ export const appController = {
 		this._chainId = web3Controller.chainId;
 	},
 
-	_updatePrice: async function () {
+	_updatePrice: function () {
+		const getFromLocalStorage = () => {
+			const dataStored = JSON.parse(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_STORED));
+			if (dataStored) {
+				this._config.price = dataStored[0].current_price / dataStored[1].current_price;
+			}
+		};
+
 		try {
-			const result = await (await fetch(this._config.priceApi)).json();
-			this._config.price = result[0].current_price / result[1].current_price;
-		} catch (error) {
-			console.error(error)
+			const lastestUpdate = parseInt(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_UPDATED));
+			if (lastestUpdate > 0) {
+				getFromLocalStorage();
+			}
+
+			if (isNaN(lastestUpdate) || (new Date().getTime() - lastestUpdate) > appConfig.updateDurationMS) {
+				setTimeout(async () => {
+					try {
+						const result = await (await fetch(this._config.priceApi)).json();
+						this._config.price = result[0].current_price / result[1].current_price;
+
+						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_STORED, JSON.stringify(result));
+						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_UPDATED, new Date().getTime());
+					} catch (fetchError) {
+						console.error(fetchError);
+					}
+				}, 1000);
+			}
+		} catch (storageError) {
+			console.error(storageError);
 		}
 	},
 
 	getData: async function () {
-		await this._updatePrice();
+		this._updatePrice();
 
 		const erc20Abi = await this._loadJson(this._config.USDC.abi);
 		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
@@ -87,12 +112,12 @@ export const appController = {
 		};
 	},
 
-	computeBTCWithUSDC: function (usdcAmount) {
-		return BigNumber(usdcAmount).dividedBy(this._config.price).multipliedBy(100000000);
+	computeBTCWithUSDC: function (usdcAmount, price = undefined) {
+		return BigNumber(usdcAmount).dividedBy(price ?? this._config.price).multipliedBy(100000000);
 	},
 
-	computeUSDCWithBTC: function (satAmount) {
-		return BigNumber(satAmount).dividedBy(100000000).multipliedBy(this._config.price).shiftedBy(6).integerValue();
+	computeUSDCWithBTC: function (satAmount, price = undefined) {
+		return BigNumber(satAmount).dividedBy(100000000).multipliedBy(price ?? this._config.price).shiftedBy(6).integerValue();
 	},
 
 	getBTCPrice: function () {
