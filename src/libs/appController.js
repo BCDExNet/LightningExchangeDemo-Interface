@@ -5,17 +5,8 @@ import { appConfig } from "../configs/appConfig";
 
 export const appController = {
 	_config: {
-		b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 		price: 24969.0668,
-		priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin",
-		"USDC": {
-			address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
-			abi: "/abis/erc20.json"
-		},
-		safeBox: {
-			address: "0xdEF092bC601cEcccAd596268b841B42306273970",
-			abi: "/abis/safe_box.json"
-		}
+		priceApi: appConfig.priceApi,
 	},
 	get config() {
 		return this._config;
@@ -39,12 +30,31 @@ export const appController = {
 			updateWeb3Func(eventObject);
 		});
 
-		this._getWeb3Context();
+		return this._getWeb3Context();
 	},
 
 	_getWeb3Context: function () {
-		this._account = web3Controller.account;
 		this._chainId = web3Controller.chainId;
+
+		if (this._checkChainIdSupported(this._chainId)) {
+			this._account = web3Controller.account;
+			this._updateAppConfig(this._chainId);
+
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	_checkChainIdSupported: function (cid) {
+		return Object.values(appConfig.networks).find(network => network.chainId === cid);
+	},
+
+	_updateAppConfig: function (chainId) {
+		this._config = {
+			...this._config,
+			...appConfig.exchanges[chainId]
+		};
 	},
 
 	_updatePrice: function () {

@@ -38,8 +38,6 @@ function App() {
   };
 
   const updateWeb3 = eventObject => {
-    console.debug("更新web3环境", eventObject);
-
     turnTimerOff();
     turnTimerOn()
   };
@@ -48,11 +46,15 @@ function App() {
     const init = async () => {
       turnTimerOff();
 
-      await appController.init(updateWeb3);
-
-      turnTimerOn();
-
-      await updateData();
+      const networkSupported = await appController.init(updateWeb3);
+      if (networkSupported) {
+        turnTimerOn();
+        await updateData();
+      } else {
+        if (window.confirm("Unsupported networks, switch to ESC?")) {
+          appController.switchNetwork(0);
+        }
+      }
     };
 
     init();
