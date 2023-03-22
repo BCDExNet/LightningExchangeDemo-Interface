@@ -35,6 +35,12 @@ export const web3Controller = {
 				method: globalUtils.constants.WALLET_SWITCH_ETHEREUM_CHAIN,
 				params: [{ chainId: cid }],
 			});
+
+			if (indexOfNetwork === 1) {
+				setTimeout(() => {
+					window.location.reload();
+				}, 3000);
+			}
 		} catch (switchError) {
 			if (switchError.code === 4902) {
 				try {

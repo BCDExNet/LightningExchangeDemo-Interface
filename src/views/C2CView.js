@@ -36,7 +36,6 @@ export const C2CView = ({ data = null }) => {
 	const handleChange = val => {
 		const theToken = data?.tokens[tokenToSellSelected];
 		setTokenAmount(BigNumber(val).shiftedBy(theToken.decimals));
-		console.debug("handleChange()", val, theToken, appController.computeBTCWithToken(theToken.symbol, val, price));
 		// setBtcValue(appController.computeBTCWithToken(theToken.symbol, val, price));
 		setBTCAmount(appController.computeBTCWithToken(theToken.symbol, val, price));
 	};
@@ -142,10 +141,15 @@ export const C2CView = ({ data = null }) => {
 
 		<AmountInput
 			title="You Buy"
-			tokens={[data?.tokens[0]]}
+			tokens={[{
+				symbol: "LN BTC(Sat)",
+				value: btcAmount.toFixed(0) + " SATs",
+				balance: BigNumber(Number.MAX_SAFE_INTEGER).shiftedBy(12),
+				decimals: 12
+			}]}
 			valueForced={btcAmount?.toFixed(0)}
 			onChange={handleChangeBTC}
-		// showMax={false}
+			showMax={false}
 		/>
 
 		<PriceControl

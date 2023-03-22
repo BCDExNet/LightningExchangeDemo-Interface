@@ -44,6 +44,7 @@ export const appConfig = {
 			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 			tokens: {
 				usdc: {
+					name: "USD Coin",
 					address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
 					abi: "/abis/erc20.json",
 					decimals: 6
@@ -58,16 +59,19 @@ export const appConfig = {
 			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 			tokens: {
 				usdc: {
+					name: "USD Coin",
 					address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
 					abi: "/abis/erc20.json",
 					decimals: 18
 				},
 				busd: {
+					name: "Binance USD",
 					address: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
 					abi: "/abis/erc20.json",
 					decimals: 18
 				},
 				btcb: {
+					name: "Binance Bitcoin",
 					address: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
 					abi: "/abis/erc20.json",
 					decimals: 18
