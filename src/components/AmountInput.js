@@ -3,19 +3,25 @@ import "./AmountInput.css";
 
 export const AmountInput = ({
 	title = "",
+	tokens = [],
+	onTokenSelected = () => { },
 	balance = 0,
 	showMax = true,
-	symbol = "",
-	tokenName = "",
 	onChange = () => { },
 	min = 1,
-	max = 0,
 	valueForced = 0,
-	deficit = false
 }) => {
-	const maxValue = max > 0 ? Math.min(max, balance) : balance;
+	const [tokenSelected, setTokenSelected] = useState(0);
+	const theToken = tokens[tokenSelected];
+	const maxValue = theToken.balance?.shiftedBy(-theToken.decimals).integerValue().toNumber();
 	const [value, setValue] = useState(min);
 	const [previousValue, setPreviousValue] = useState(min);
+
+	const handleSelectToken = event => {
+		const idx = event.target.selectedIndex;
+		setTokenSelected(idx);
+		onTokenSelected(idx);
+	};
 
 	useEffect(() => {
 		if (valueForced > 0) {
@@ -47,14 +53,24 @@ export const AmountInput = ({
 			<div className="title">{title}</div>
 
 			{showMax > 0 && <div>
-				<span>Balance: {balance}&nbsp;</span>
+				<span>Balance: {theToken.balance?.shiftedBy(-theToken.decimals).toFixed(0)}&nbsp;</span>
 
 				<button onClick={handleMax}>MAX</button>
 			</div>}
 		</div>
 
 		<div className="titleBar">
-			<div>{symbol}&nbsp;</div>
+			<select
+				value={theToken?.symbol}
+				onChange={handleSelectToken}>
+				{tokens.map(token => {
+					return <option
+						key={token.symbol}
+						value={token.symbol}>
+						{token.symbol}
+					</option>
+				})}
+			</select>
 
 			<input
 				className="numberInput"
@@ -64,7 +80,7 @@ export const AmountInput = ({
 				value={value}
 				min={min}
 				max={maxValue}
-				style={{ color: deficit ? "red" : "white" }} />
+				style={{ color: (theToken.balance?.lt(valueForced) || theToken.balance?.lt(value)) ? "red" : "white" }} />
 		</div>
 	</div>
 };

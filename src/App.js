@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { appController } from './libs/appController';
-import { DepositInfo } from './views/DepositInfo';
 import { Header } from './views/Header';
 import { MainView } from './views/MainView';
 
 let updatingTimer = null;
 let isFetching = false;
+
+const DepositInfo = lazy(() => import("./views/DepositInfo"));
 
 function App() {
   const [data, setData] = useState(null);
@@ -38,8 +39,6 @@ function App() {
   };
 
   const updateWeb3 = eventObject => {
-    console.debug("更新web3环境", eventObject);
-
     turnTimerOff();
     turnTimerOn()
   };
@@ -48,11 +47,15 @@ function App() {
     const init = async () => {
       turnTimerOff();
 
-      await appController.init(updateWeb3);
-
-      turnTimerOn();
-
-      await updateData();
+      const networkSupported = await appController.init(updateWeb3);
+      if (networkSupported) {
+        turnTimerOn();
+        await updateData();
+      } else {
+        if (window.confirm("Unsupported networks, switch to ESC?")) {
+          appController.switchNetwork(0);
+        }
+      }
     };
 
     init();
@@ -68,7 +71,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<MainView data={data} />} />
-            <Route path='/deposit/:secret' element={<DepositInfo />} />
+            <Route path='/deposit/:secret' element={<DepositInfo chainId={data?.chainId} />} />
           </Routes>
         </BrowserRouter>
       </div>

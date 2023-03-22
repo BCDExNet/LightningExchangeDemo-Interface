@@ -5,17 +5,8 @@ import { appConfig } from "../configs/appConfig";
 
 export const appController = {
 	_config: {
-		b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
-		price: 24969.0668,
-		priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin",
-		"USDC": {
-			address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
-			abi: "/abis/erc20.json"
-		},
-		safeBox: {
-			address: "0xdEF092bC601cEcccAd596268b841B42306273970",
-			abi: "/abis/safe_box.json"
-		}
+		// price: 24969.0668,
+		priceApi: appConfig.priceApi,
 	},
 	get config() {
 		return this._config;
@@ -39,19 +30,51 @@ export const appController = {
 			updateWeb3Func(eventObject);
 		});
 
-		this._getWeb3Context();
+		return this._getWeb3Context();
 	},
 
 	_getWeb3Context: function () {
-		this._account = web3Controller.account;
 		this._chainId = web3Controller.chainId;
+
+		if (this._checkChainIdSupported(this._chainId)) {
+			this._account = web3Controller.account;
+			this._updateAppConfig(this._chainId);
+
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	_checkChainIdSupported: function (cid) {
+		return Object.values(appConfig.networks).find(network => network.chainId === cid);
+	},
+
+	_updateAppConfig: function (chainId) {
+		this._config = {
+			...this._config,
+			...appConfig.exchanges[chainId]
+		};
 	},
 
 	_updatePrice: function () {
+		const parsePrices = apiResult => {
+			const prices = {};
+
+			apiResult.map(item => {
+				return prices[item.symbol] = {
+					symbol: item.symbol,
+					price: apiResult[0].current_price / item.current_price
+				}
+			});
+
+			return prices;
+		};
+
 		const getFromLocalStorage = () => {
 			const dataStored = JSON.parse(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_STORED));
 			if (dataStored) {
-				this._config.price = dataStored[0].current_price / dataStored[1].current_price;
+				this._config.prices = parsePrices(dataStored);
 			}
 		};
 
@@ -65,7 +88,7 @@ export const appController = {
 				setTimeout(async () => {
 					try {
 						const result = await (await fetch(this._config.priceApi)).json();
-						this._config.price = result[0].current_price / result[1].current_price;
+						this._config.prices = parsePrices(result);
 
 						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_STORED, JSON.stringify(result));
 						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_UPDATED, new Date().getTime());
@@ -79,18 +102,24 @@ export const appController = {
 		}
 	},
 
+	getDataWithToken: async function (token) {
+		const tokenConfig = this._config.tokens[token];
+		const erc20Abi = await this._loadJson(tokenConfig.abi);
+		const allowance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "allowance", this._account, this._config.safeBox.address);
+		const balance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "balanceOf", this._account);
+
+		return {
+			allowance: BigNumber(allowance),
+			balance: BigNumber(balance)
+		}
+	},
+
 	getData: async function () {
 		this._updatePrice();
 
-		const erc20Abi = await this._loadJson(this._config.USDC.abi);
-		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
 		let i = 0;
-
-		const allowance = await web3Controller.callContract(this._config.USDC.address, erc20Abi, "allowance", this._account, this._config.safeBox.address);
-
-		const usdcBalance = await web3Controller.callContract(this._config.USDC.address, erc20Abi, "balanceOf", this._account);
-
 		const orders = [];
+		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
 
 		let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
 		while (i < howManyOrder) {
@@ -105,29 +134,40 @@ export const appController = {
 			i++;
 		}
 
+		const tokenSymbols = Object.keys(this._config.tokens);
+		const tokens = Object.values(this._config.tokens);
+		tokens.forEach((token, index) => {
+			token.symbol = tokenSymbols[index];
+		});
+
 		return {
-			allowance: BigNumber(allowance),
-			usdcBalance: BigNumber(usdcBalance),
-			orders
+			orders,
+			tokens
 		};
 	},
 
-	computeBTCWithUSDC: function (usdcAmount, price = undefined) {
-		return BigNumber(usdcAmount).dividedBy(price ?? this._config.price).multipliedBy(100000000);
+	computeBTCWithToken: function (token, tokenAmount, price = undefined) {
+		return BigNumber(tokenAmount)
+			.dividedBy(price ?? this._config.prices[token].price)
+			.multipliedBy(100000000);
 	},
 
-	computeUSDCWithBTC: function (satAmount, price = undefined) {
-		return BigNumber(satAmount).dividedBy(100000000).multipliedBy(price ?? this._config.price).shiftedBy(6).integerValue();
+	computeTokenWithBTC: function (satAmount, token, price = undefined) {
+		return BigNumber(satAmount)
+			.dividedBy(100000000)
+			.multipliedBy(price ?? this._config.prices[token].price)
+			.shiftedBy(this._config.tokens[token].decimals);
 	},
 
-	getBTCPrice: function () {
-		return this._config.price;
+	getBTCPrice: function (token) {
+		return this._config.prices[token].price;
 	},
 
-	approve: async function (doneCallback, cancelCallback) {
-		const abi = await this._loadJson(this._config.USDC.abi);
+	approve: async function (token, doneCallback, cancelCallback) {
+		const tokenConfig = this._config.tokens[token];
+		const abi = await this._loadJson(tokenConfig.abi);
 		web3Controller.sendContract(
-			this._config.USDC.address,
+			tokenConfig.address,
 			abi,
 			"approve",
 			doneCallback,
@@ -137,7 +177,7 @@ export const appController = {
 		);
 	},
 
-	deposit: async function (amount, beneficiary, secretHash, deadline, invoice, doneCallback, cancelCallback) {
+	deposit: async function (token, amount, beneficiary, secretHash, deadline, invoice, doneCallback, cancelCallback) {
 		const abi = await this._loadJson(this._config.safeBox.abi);
 		web3Controller.sendContract(
 			this._config.safeBox.address,
@@ -145,7 +185,7 @@ export const appController = {
 			"deposit",
 			doneCallback,
 			cancelCallback,
-			this._config.USDC.address,
+			this._config.tokens[token].address,
 			amount,
 			beneficiary,
 			secretHash,

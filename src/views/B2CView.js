@@ -1,8 +1,7 @@
-import BigNumber from "bignumber.js";
 import { useEffect, useState } from "react";
-// import { AmountInput } from "../components/AmountInput";
 import { AmountLabel } from "../components/AmountLabel";
 import { StringInput } from "../components/StringInput";
+import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
 import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
@@ -10,37 +9,50 @@ import "./MainView.css";
 
 export const B2CView = ({ data = null }) => {
 	const taker = appController.config.b2cTaker;
-	const [usdcAmount, setUSDCAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
-	// const [btcValue, setBtcValue] = useState(globalUtils.constants.BIGNUMBER_ZERO);
+	const [tokenAmount, setTokenAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
 	const [invoice, setInvoice] = useState("");
 	const [btcAmount, setBTCAmount] = useState(0);
 	const [expiry, setExpiry] = useState(0);
 	const [secretHash, setSecretHash] = useState("");
+	const [tokenToSellSelected, setTokenToSellSelected] = useState(0);
 
-	// useEffect(() => {
-	// 	setBtcValue(appController.computeBTCWithUSDC(1));
-	// }, [data?.updated]);
+	const updateTokenData = async index => {
+		const theToken = data.tokens[index];
+		const result = await appController.getDataWithToken(theToken.symbol);
+		theToken.allowance = result.allowance;
+		theToken.balance = result.balance;
+	};
 
-	// const handleChange = val => {
-	// 	setUSDCAmount(BigNumber(val).shiftedBy(6));
-	// 	setBtcValue(appController.computeBTCWithUSDC(val));
-	// };
+	const recomputeAmountToSell = (index, sats) => {
+		const theToken = data.tokens[index];
+		const howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
+		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
+		theToken.deficit = howMuchToken.gt(theToken.balance);
+	};
+
+	useEffect(() => {
+		if (data) {
+			updateTokenData(0);
+		}
+	}, [data]);
 
 	const handleChangeInvoice = val => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
-			if (decoded.amount > 0) {
-				const sats = decoded.amount / 1000;
+			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * 1000) {
+				const sats = decoded.amount / 1000 + appConfig.fee;
+
+				recomputeAmountToSell(tokenToSellSelected, sats);
+
 				setBTCAmount(sats);
-				setUSDCAmount(appController.computeUSDCWithBTC(sats));
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
 			} else {
-				window.alert("Amount is 0.");
+				window.alert("Amount is 0 or more than " + appConfig.btcLimit);
 
 				setBTCAmount(0);
-				setUSDCAmount(globalUtils.constants.BIGNUMBER_ZERO);
+				setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO);
 				setExpiry(0);
 				setSecretHash("");
 			}
@@ -57,7 +69,7 @@ export const B2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			usdcAmount.toString(),
+			tokenAmount.toString(),
 			taker,
 			secretHash,
 			expiry,
@@ -69,6 +81,12 @@ export const B2CView = ({ data = null }) => {
 		);
 	};
 
+	const handleSelectToken = async idx => {
+		await updateTokenData(idx);
+		setTokenToSellSelected(idx);
+		recomputeAmountToSell(idx, btcAmount);
+	};
+
 	return <div className="subViewLayout">
 		<StringInput
 			title="LN Invoice"
@@ -76,31 +94,23 @@ export const B2CView = ({ data = null }) => {
 			placeholder="lnbc1..."
 			qr={true} />
 
-		{/* <AmountInput
-			title="You Sell"
-			balance={data?.usdcBalance?.shiftedBy(-6).toNumber()}
-			symbol="USDC"
-			tokenName="USD Coin"
-			onChange={handleChange}
-			max={10} /> */}
 		<AmountLabel
 			title="You Sell"
-			symbol="USDC"
-			tokenName="USD Coin"
-			value={usdcAmount.shiftedBy(-6).toFixed()}
-			deficit={usdcAmount.gt(data?.usdcBalance)} />
+			tokens={data?.tokens}
+			onTokenSelected={handleSelectToken} />
 
 		<AmountLabel
 			title="You Buy"
-			symbol="LN BTC"
-			tokenName="Wrapped BTC"
-			value={btcAmount.toFixed(0) + " SATs"} />
+			tokens={[{
+				symbol: "LN BTC(Sat)",
+				value: btcAmount.toFixed(0) + " SATs"
+			}]} />
 
-		{data?.allowance?.lt(usdcAmount) ? <button
+		{data?.allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
 			onClick={handleApprove}>Approve</button> : <button
 				className="fullwidthButton"
 				onClick={handleDeposit}
-				disabled={usdcAmount.eq(0) || !taker || !invoice || usdcAmount.gt(data?.usdcBalance)}>Deposit</button>}
+				disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}
 	</div>
 };
