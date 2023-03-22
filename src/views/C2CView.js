@@ -10,27 +10,39 @@ import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./MainView.css";
 
 export const C2CView = ({ data = null }) => {
-	const [usdcAmount, setUSDCAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
-	const [btcValue, setBtcValue] = useState(globalUtils.constants.BIGNUMBER_ZERO);
+	const [tokenAmount, setTokenAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
+	// const [btcValue, setBtcValue] = useState(globalUtils.constants.BIGNUMBER_ZERO);
 	const [taker, setTaker] = useState("");
 	const [btcAmount, setBTCAmount] = useState(0);
 	const [expiry, setExpiry] = useState(0);
 	const [secretHash, setSecretHash] = useState("");
 	const [invoice, setInvoice] = useState("");
-	const [price, setPrice] = useState(appController.getBTCPrice());
+	const [price, setPrice] = useState(0);
+	const [tokenToSellSelected, setTokenToSellSelected] = useState(0);
 
 	useEffect(() => {
-		setBtcValue(appController.computeBTCWithUSDC(1, price));
-	}, [data?.updated]);
+		if (data) {
+			setPrice(appController.getBTCPrice(data.tokens[0].symbol));
+			setBTCAmount(appController.computeBTCWithToken(data.tokens[0].symbol, 1));
+		}
+	}, []);
+
+	// useEffect(() => {
+	// 	// setBtcValue(appController.computeBTCWithToken(data?.tokens[0].symbol, 1, price));
+	// 	setBTCAmount(appController.computeBTCWithToken(data?.tokens[0].symbol, 1, price));
+	// }, [data.updated, price]);
 
 	const handleChange = val => {
-		setUSDCAmount(BigNumber(val).shiftedBy(6));
-		setBtcValue(appController.computeBTCWithUSDC(val, price));
+		const theToken = data?.tokens[tokenToSellSelected];
+		setTokenAmount(BigNumber(val).shiftedBy(theToken.decimals));
+		console.debug("handleChange()", val, theToken, appController.computeBTCWithToken(theToken.symbol, val, price));
+		// setBtcValue(appController.computeBTCWithToken(theToken.symbol, val, price));
+		setBTCAmount(appController.computeBTCWithToken(theToken.symbol, val, price));
 	};
 
 	const handleChangeBTC = val => {
 		setBTCAmount(val);
-		setUSDCAmount(appController.computeUSDCWithBTC(val, price));
+		setTokenAmount(appController.computeTokenWithBTC(val, data.tokens[tokenToSellSelected].symbol, price));
 	}
 
 	const handleChangeTaker = val => {
@@ -39,7 +51,7 @@ export const C2CView = ({ data = null }) => {
 
 	const reset = () => {
 		setBTCAmount(0);
-		setUSDCAmount(globalUtils.constants.BIGNUMBER_ZERO)
+		setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO)
 		setExpiry(0);
 		setSecretHash("");
 	};
@@ -49,8 +61,11 @@ export const C2CView = ({ data = null }) => {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
 				const sats = decoded.amount / 1000;
+
+				recomputeAmountToSell(tokenToSellSelected, sats);
+
+				setTokenAmount(appController.computeTokenWithBTC(sats, data.tokens[tokenToSellSelected].symbol));
 				setBTCAmount(sats);
-				setUSDCAmount(appController.computeUSDCWithBTC(sats, price));
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
@@ -70,7 +85,7 @@ export const C2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			usdcAmount.toString(),
+			tokenAmount.toString(),
 			taker,
 			secretHash,
 			expiry,
@@ -87,6 +102,28 @@ export const C2CView = ({ data = null }) => {
 		});
 	};
 
+	const updateTokenData = async index => {
+		const theToken = data.tokens[index];
+		const result = await appController.getDataWithToken(theToken.symbol);
+		theToken.allowance = result.allowance;
+		theToken.balance = result.balance;
+	};
+
+	const recomputeAmountToSell = (index, sats) => {
+		const theToken = data.tokens[index];
+		const howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
+		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
+		theToken.deficit = howMuchToken.gt(theToken.balance);
+	};
+
+	const handleSelectToken = async idx => {
+		await updateTokenData(idx);
+		setTokenToSellSelected(idx);
+		setPrice(appController.getBTCPrice(data?.tokens[idx].symbol));
+		setBTCAmount(appController.computeBTCWithToken(data?.tokens[idx].symbol, 1));
+		recomputeAmountToSell(idx, btcAmount);
+	};
+
 	return <div className="subViewLayout">
 		<StringInput
 			title="LN Invoice"
@@ -96,27 +133,23 @@ export const C2CView = ({ data = null }) => {
 
 		<AmountInput
 			title="You Sell"
-			balance={data?.usdcBalance?.shiftedBy(-6).toNumber()}
-			symbol="USDC"
-			tokenName="USD Coin"
+			tokens={data?.tokens}
+			onTokenSelected={handleSelectToken}
 			onChange={handleChange}
-			valueForced={usdcAmount.shiftedBy(-6).toNumber()}
-			deficit={usdcAmount.gt(data?.usdcBalance)} />
+			valueForced={tokenAmount.shiftedBy(-data.tokens[tokenToSellSelected].decimals).toNumber()}
+		/>
 
 		<AmountInput
 			title="You Buy"
-			symbol="LN BTC(Sat)"
-			tokenName="Wrapped BTC"
-			valueForced={btcAmount}
+			tokens={[data?.tokens[0]]}
+			valueForced={btcAmount?.toFixed(0)}
 			onChange={handleChangeBTC}
-			min={0}
-			max={Number.MAX_SAFE_INTEGER}
-			balance={Number.MAX_SAFE_INTEGER}
-			showMax={false} />
+		// showMax={false}
+		/>
 
 		<PriceControl
 			title="USDC per WBTC (+1.17%)"
-			defaultPrice={appController.getBTCPrice()}
+			defaultPrice={price}
 			onChange={handleUpdatePrice} />
 
 		<StringInput
@@ -124,11 +157,11 @@ export const C2CView = ({ data = null }) => {
 			onChange={handleChangeTaker}
 			placeholder="0x..." />
 
-		{data?.allowance?.lt(usdcAmount) ? <button
+		{data?.allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
 			onClick={handleApprove}>Approve</button> : <button
 				className="fullwidthButton"
 				onClick={handleDeposit}
-				disabled={usdcAmount.eq(0) || !taker || !invoice || usdcAmount.gt(data?.usdcBalance)}>Deposit</button>}
+				disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}
 	</div>
 };

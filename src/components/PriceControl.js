@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./AmountInput.css";
 
 export const PriceControl = ({
@@ -7,6 +7,10 @@ export const PriceControl = ({
 	onChange = () => { }
 }) => {
 	const [price, setPrice] = useState(defaultPrice);
+
+	useEffect(() => {
+		setPrice(defaultPrice)
+	}, [defaultPrice]);
 
 	const updatePrice = newPrice => {
 		setPrice(newPrice);
