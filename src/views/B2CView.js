@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AmountLabel } from "../components/AmountLabel";
 import { StringInput } from "../components/StringInput";
+import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
 import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
@@ -38,12 +39,9 @@ export const B2CView = ({ data = null }) => {
 	const handleChangeInvoice = val => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
-			if (decoded.amount > 0) {
-				const sats = decoded.amount / 1000;
+			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * 1000) {
+				const sats = decoded.amount / 1000 + appConfig.fee;
 
-				// const howMuchToken = appController.computeTokenWithBTC(sats, currentToken.symbol);
-				// setTokenAmount(howMuchToken);
-				// currentToken.value = howMuchToken.shiftedBy(-currentToken.decimals).toFixed();
 				recomputeAmountToSell(tokenToSellSelected, sats);
 
 				setBTCAmount(sats);
@@ -51,7 +49,7 @@ export const B2CView = ({ data = null }) => {
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
 			} else {
-				window.alert("Amount is 0.");
+				window.alert("Amount is 0 or more than " + appConfig.btcLimit);
 
 				setBTCAmount(0);
 				setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO);

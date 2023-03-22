@@ -4,6 +4,7 @@ import { AmountInput } from "../components/AmountInput";
 import { AmountLabel } from "../components/AmountLabel";
 import { PriceControl } from "../components/PriceControl";
 import { StringInput } from "../components/StringInput";
+import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
 import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
@@ -60,7 +61,7 @@ export const C2CView = ({ data = null }) => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
-				const sats = decoded.amount / 1000;
+				const sats = decoded.amount / 1000 + appConfig.fee;
 
 				recomputeAmountToSell(tokenToSellSelected, sats);
 
