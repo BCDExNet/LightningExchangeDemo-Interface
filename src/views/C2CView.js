@@ -60,11 +60,11 @@ export const C2CView = ({ data = null }) => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
-				const sats = decoded.amount / 1000 + appConfig.fee;
+				const sats = decoded.amount / 1000;
 
-				recomputeAmountToSell(tokenToSellSelected, sats);
+				recomputeAmountToSell(tokenToSellSelected, sats + appConfig.fee);
 
-				setTokenAmount(appController.computeTokenWithBTC(sats, data.tokens[tokenToSellSelected].symbol));
+				setTokenAmount(appController.computeTokenWithBTC(sats + appConfig.fee, data.tokens[tokenToSellSelected].symbol));
 				setBTCAmount(sats);
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
 				setSecretHash("0x" + decoded.paymentHash);
@@ -85,7 +85,8 @@ export const C2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			tokenAmount.toString(),
+			data?.tokens[tokenToSellSelected].symbol,
+			tokenAmount.integerValue().toString(),
 			taker,
 			secretHash,
 			expiry,
@@ -97,9 +98,14 @@ export const C2CView = ({ data = null }) => {
 	};
 
 	const handleApprove = () => {
-		appController.approve(() => {
-			// window.location.reload();
-		});
+		appController.approve(
+			data?.tokens[tokenToSellSelected].symbol,
+			() => {
+				setTimeout(() => {
+					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
+				}, 6000);
+			}
+		);
 	};
 
 	const updateTokenData = async index => {
@@ -136,8 +142,7 @@ export const C2CView = ({ data = null }) => {
 			tokens={data?.tokens}
 			onTokenSelected={handleSelectToken}
 			onChange={handleChange}
-			valueForced={tokenAmount.shiftedBy(-data.tokens[tokenToSellSelected].decimals).toNumber()}
-		/>
+			valueForced={tokenAmount.shiftedBy(-data.tokens[tokenToSellSelected].decimals).toNumber()} />
 
 		<AmountInput
 			title="You Buy"
@@ -162,7 +167,7 @@ export const C2CView = ({ data = null }) => {
 			onChange={handleChangeTaker}
 			placeholder="0x..." />
 
-		{data?.allowance?.lt(tokenAmount) ? <button
+		{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
 			onClick={handleApprove}>Approve</button> : <button
 				className="fullwidthButton"

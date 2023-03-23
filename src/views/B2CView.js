@@ -28,6 +28,8 @@ export const B2CView = ({ data = null }) => {
 		const howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
 		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
 		theToken.deficit = howMuchToken.gt(theToken.balance);
+
+		setTokenAmount(howMuchToken.integerValue());
 	};
 
 	useEffect(() => {
@@ -40,9 +42,9 @@ export const B2CView = ({ data = null }) => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * 1000) {
-				const sats = decoded.amount / 1000 + appConfig.fee;
+				const sats = decoded.amount / 1000;
 
-				recomputeAmountToSell(tokenToSellSelected, sats);
+				recomputeAmountToSell(tokenToSellSelected, sats + appConfig.fee);
 
 				setBTCAmount(sats);
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
@@ -62,13 +64,19 @@ export const B2CView = ({ data = null }) => {
 	};
 
 	const handleApprove = () => {
-		appController.approve(() => {
-			// window.location.reload();
-		});
+		appController.approve(
+			data?.tokens[tokenToSellSelected].symbol,
+			() => {
+				setTimeout(() => {
+					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
+				}, 6000);
+			}
+		);
 	};
 
 	const handleDeposit = () => {
 		appController.deposit(
+			data?.tokens[tokenToSellSelected].symbol,
 			tokenAmount.toString(),
 			taker,
 			secretHash,
@@ -106,7 +114,7 @@ export const B2CView = ({ data = null }) => {
 				value: btcAmount.toFixed(0) + " SATs"
 			}]} />
 
-		{data?.allowance?.lt(tokenAmount) ? <button
+		{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
 			onClick={handleApprove}>Approve</button> : <button
 				className="fullwidthButton"

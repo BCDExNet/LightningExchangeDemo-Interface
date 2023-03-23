@@ -17,7 +17,7 @@ const DepositInfo = ({ chainId = 0 }) => {
 
 	useEffect(() => {
 		if (chainId > 0 && data) {
-			setTheToken(Object.values(appConfig.exchanges[chainId].tokens).find(item => item.address === data.token));
+			setTheToken(Object.values(appConfig.exchanges[chainId].tokens).find(item => item.address.toLocaleLowerCase() === data.token.toLocaleLowerCase()));
 		}
 	}, [chainId, data]);
 
