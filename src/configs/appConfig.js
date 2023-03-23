@@ -2,25 +2,8 @@ export const appConfig = {
 	fee: 100,
 	btcLimit: 50000,
 	updateDurationMS: 600000,
-	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin",
+	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin",
 	networks: {
-		elastos: {
-			chainName: "Elastos",
-			chain: "ESC",
-			chainId: 20,
-			rpcUrls: [
-				"https://api.elastos.io/esc"
-			],
-			nativeCurrency: {
-				name: "ELA",
-				symbol: "ELA",
-				decimals: 18
-			},
-			blockExplorerUrls: [
-				"https://eth.elastos.io/"
-			],
-			iconUrls: []
-		},
 		bsc: {
 			chainName: "Binance",
 			chain: "BSC",
@@ -35,6 +18,40 @@ export const appConfig = {
 			},
 			blockExplorerUrls: [
 				"https://bscscan.com/"
+			],
+			iconUrls: []
+		},
+		arbitrum: {
+			chainName: "Arbitrum",
+			chain: "Arbitrum",
+			chainId: 42161,
+			rpcUrls: [
+				"https://arb1.arbitrum.io/rpc"
+			],
+			nativeCurrency: {
+				name: "ETH",
+				symbol: "ETH",
+				decimals: 18
+			},
+			blockExplorerUrls: [
+				"https://arbiscan.io/"
+			],
+			iconUrls: []
+		},
+		elastos: {
+			chainName: "Elastos",
+			chain: "ESC",
+			chainId: 20,
+			rpcUrls: [
+				"https://api.elastos.io/esc"
+			],
+			nativeCurrency: {
+				name: "ELA",
+				symbol: "ELA",
+				decimals: 18
+			},
+			blockExplorerUrls: [
+				"https://eth.elastos.io/"
 			],
 			iconUrls: []
 		}
@@ -79,6 +96,33 @@ export const appConfig = {
 			},
 			safeBox: {
 				address: "0xd1a9559D4D54Ae11ad5ceBa1b309484502f4575d",
+				abi: "/abis/safe_box.json"
+			}
+		},
+		"42161": {
+			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
+			tokens: {
+				usdc: {
+					name: "USD Coin",
+					address: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+					abi: "/abis/erc20.json",
+					decimals: 6
+				},
+				usdt: {
+					name: "Techer USD",
+					address: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+					abi: "/abis/erc20.json",
+					decimals: 6
+				},
+				wbtc: {
+					name: "Wrapped Bitcoin",
+					address: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+					abi: "/abis/erc20.json",
+					decimals: 8
+				}
+			},
+			safeBox: {
+				address: "0xB5a90265631efECF6e4B4F23C23f4B7367839D63",
 				abi: "/abis/safe_box.json"
 			}
 		}
