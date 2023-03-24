@@ -103,6 +103,12 @@ export const C2CView = ({ data = null }) => {
 			() => {
 				setTimeout(() => {
 					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
+
+					setTimeout(() => {
+						if (tokenAmount.gt(0) && taker && invoice && !data?.tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
+							handleDeposit();
+						}
+					}, 1000);
 				}, 6000);
 			}
 		);
