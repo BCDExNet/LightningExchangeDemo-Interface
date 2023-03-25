@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { StringInput } from "../components/StringInput";
 import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
+import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./DepositInfo.css";
 
@@ -53,7 +54,11 @@ const DepositInfo = ({ chainId = 0 }) => {
 	}, [secret]);
 
 	const handleChangePreimage = val => {
-		setPreimage(val);
+		if (val.indexOf(globalUtils.constants.HEX_PREFIX) !== 0) {
+			setPreimage(globalUtils.constants.HEX_PREFIX + val);
+		} else {
+			setPreimage(val);
+		}
 	};
 
 	const handleWithdraw = event => {
