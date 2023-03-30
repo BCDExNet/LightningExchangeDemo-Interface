@@ -19,7 +19,7 @@ export const appConfig = {
 			blockExplorerUrls: [
 				"https://bscscan.com/"
 			],
-			iconUrls: []
+			iconUrls: ["/images/bsc.svg"]
 		},
 		arbitrum: {
 			chainName: "Arbitrum",
@@ -36,7 +36,7 @@ export const appConfig = {
 			blockExplorerUrls: [
 				"https://arbiscan.io/"
 			],
-			iconUrls: []
+			iconUrls: ["/images/arbitrum.svg"]
 		},
 		elastos: {
 			chainName: "Elastos",
@@ -53,7 +53,7 @@ export const appConfig = {
 			blockExplorerUrls: [
 				"https://eth.elastos.io/"
 			],
-			iconUrls: []
+			iconUrls: ["/images/esc.svg"]
 		}
 	},
 	exchanges: {
@@ -64,7 +64,8 @@ export const appConfig = {
 					name: "USD Coin",
 					address: "0xA06be0F5950781cE28D965E5EFc6996e88a8C141",
 					abi: "/abis/erc20.json",
-					decimals: 6
+					decimals: 6,
+					logo: "/images/usdc.png"
 				}
 			},
 			safeBox: {
@@ -79,7 +80,8 @@ export const appConfig = {
 					name: "USD Coin",
 					address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
 					abi: "/abis/erc20.json",
-					decimals: 18
+					decimals: 18,
+					logo: "/images/usdc.png"
 				},
 				busd: {
 					name: "Binance USD",
@@ -106,7 +108,8 @@ export const appConfig = {
 					name: "USD Coin",
 					address: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
 					abi: "/abis/erc20.json",
-					decimals: 6
+					decimals: 6,
+					logo: "/images/usdc.png"
 				},
 				usdt: {
 					name: "Techer USD",

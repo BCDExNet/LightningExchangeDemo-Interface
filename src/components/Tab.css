@@ -1,7 +1,16 @@
 .tabLayout {
 	display: flex;
 	flex-direction: row;
-	column-gap: 1em;
+	align-items: center;
+	column-gap: 6px;
+	padding: 14px 12px;
+	background: #3E3E3E;
+	border-radius: 16px;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	color: #F6F6F6;
 }
 
 .tabLayout .option input {
@@ -14,6 +23,8 @@
 }
 
 .tabLayout .option input:checked+label {
-	font-weight: bolder;
-	color: white;
+	padding: 6px 10px;
+	background: #F6F6F6;
+	border-radius: 12px;
+	color: #1B1B1B;
 }

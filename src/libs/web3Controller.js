@@ -23,6 +23,10 @@ export const web3Controller = {
 			this.account = accounts[0];
 
 			this.chainId = parseInt(this._web3.currentProvider.chainId, 16);
+
+			return true;
+		} else {
+			return false;
 		}
 	},
 

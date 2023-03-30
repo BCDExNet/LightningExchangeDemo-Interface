@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { useEffect, useState } from "react";
 import { AmountLabel } from "../components/AmountLabel";
 import { StringInput } from "../components/StringInput";
@@ -41,8 +42,8 @@ export const B2CView = ({ data = null }) => {
 	const handleChangeInvoice = val => {
 		try {
 			const decoded = invoiceDecoder.decode(val);
-			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * 1000) {
-				const sats = decoded.amount / 1000;
+			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * globalUtils.constants.SAT_RATE) {
+				const sats = decoded.amount / globalUtils.constants.SAT_RATE;
 
 				recomputeAmountToSell(tokenToSellSelected, sats + appConfig.fee);
 
@@ -103,22 +104,36 @@ export const B2CView = ({ data = null }) => {
 
 	return <div className="subViewLayout">
 		<StringInput
-			title="LN Invoice"
+			title="Invoice"
+			tooltip="Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID."
 			onChange={handleChangeInvoice}
 			placeholder="lnbc1..."
 			qr={true} />
 
-		<AmountLabel
-			title="You Sell"
-			tokens={data?.tokens}
-			onTokenSelected={handleSelectToken} />
+		<div className="amountLabel">
+			<div>
+				<div>You'll get</div>
+				<div className="subTitle">(invoice amount)</div>
+			</div>
+
+			<div className="btcValue">
+				<img
+					src="/images/btc.png"
+					height="24px"
+					alt="btc" />
+
+				<div className="value">
+					<div>{btcAmount.toFixed(0)}&nbsp;sat</div>
+					<div className="subTitle">{data && appController.sat2btc(btcAmount).multipliedBy(appController.getBTCPrice("usdc")).toFixed(2)}&nbsp;USD</div>
+				</div>
+			</div>
+		</div>
 
 		<AmountLabel
-			title="You Buy"
-			tokens={[{
-				symbol: "LN BTC(Sat)",
-				value: btcAmount.toFixed(0) + " SATs"
-			}]} />
+			title="deposit"
+			tooltip="Choose what asset to deposit in exchange for the lighting invoice amount."
+			tokens={data?.tokens}
+			onTokenSelected={handleSelectToken} />
 
 		{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"

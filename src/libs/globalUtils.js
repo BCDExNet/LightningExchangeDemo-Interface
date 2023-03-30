@@ -7,6 +7,7 @@ export const globalUtils = {
 		BIGNUMBER_ZERO: BigNumber(0),
 		PRICE_DATA_STORED: "priceDataStored",
 		PRICE_DATA_UPDATED: "priceDataUpdated",
-		HEX_PREFIX: "0x"
+		HEX_PREFIX: "0x",
+		SAT_RATE: 1000
 	}
 };

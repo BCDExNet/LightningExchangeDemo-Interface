@@ -1,0 +1,21 @@
+.linkWithIcon {
+	text-decoration: none;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 14px;
+	color: #FFFFFF;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	column-gap: 10px;
+	text-transform: capitalize;
+	padding: 8px 16px;
+}
+
+.linkWithIcon:hover {
+	padding: 8px 16px;
+	background: #5E5E5E;
+	border-radius: 12px;
+}

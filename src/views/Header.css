@@ -10,7 +10,7 @@
 	flex-direction: row;
 	justify-content: flex-start;
 	align-items: center;
-	column-gap: 1.5em;
+	column-gap: 1em;
 }
 
 .headerLayout .menu a {
@@ -19,5 +19,42 @@
 }
 
 .headerLayout .menu .label {
-	font-size: 1em;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px 12px;
+	background: #3E3E3E;
+	border-radius: 12px;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	color: #FFFFFF;
+	column-gap: 8px;
+}
+
+.optionLayout {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	column-gap: 0.5em;
+}
+
+.optionLayout .title {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: baseline;
+	column-gap: 0.5em;
+}
+
+.optionLayout .title .subTitle {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 10px;
+	color: #FFFFFF;
+	opacity: 0.7;
 }

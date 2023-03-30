@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
 import "./AmountInput.css";
+import { Tooltip } from "./Tooltip";
+
+let originPrice = 0;
 
 export const PriceControl = ({
 	title = "",
+	tooltip = null,
 	defaultPrice = 0,
 	onChange = () => { }
 }) => {
 	const [price, setPrice] = useState(defaultPrice);
 
 	useEffect(() => {
-		setPrice(defaultPrice)
+		originPrice = defaultPrice;
+	}, []);
+
+	useEffect(() => {
+		setPrice(defaultPrice);
 	}, [defaultPrice]);
 
 	const updatePrice = newPrice => {
 		setPrice(newPrice);
 		onChange(newPrice);
+	};
+
+	const handleResetPrice = () => {
+		setPrice(originPrice);
 	};
 
 	const handleReduce = () => {
@@ -27,18 +39,33 @@ export const PriceControl = ({
 		updatePrice(newPrice);
 	};
 
-	return <div className="amountInputLayout">
-		<div>{title}</div>
+	return <div
+		className="amountInputLayout"
+		style={{
+			flexDirection: "row",
+			justifyContent: "space-between",
+			alignItems: "center"
+		}}>
+		<div>
+			{title}
+
+			{tooltip && <Tooltip content={tooltip} />}
+		</div>
 
 		<div className="line">
-			<button
-				className="smallButton"
-				onClick={handleReduce}>-1%</button>
-
 			<span>{price}</span>
 
 			<button
-				className="smallButton"
+				className="tinyButton"
+				onClick={handleResetPrice}>reset</button>
+
+			<button
+				className="tinyButton"
+				onClick={handleReduce}>-1%</button>
+
+
+			<button
+				className="tinyButton"
 				onClick={handleIncrease}>+1%</button>
 		</div>
 	</div>

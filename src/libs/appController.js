@@ -25,80 +25,13 @@ export const appController = {
 	_data: null,
 
 	init: async function (updateWeb3Func) {
-		await web3Controller.connect(eventObject => {
+		const success = await web3Controller.connect(eventObject => {
 			this._getWeb3Context();
 			updateWeb3Func(eventObject);
 		});
 
-		return this._getWeb3Context();
-	},
-
-	_getWeb3Context: function () {
-		this._chainId = web3Controller.chainId;
-
-		if (this._checkChainIdSupported(this._chainId)) {
-			this._account = web3Controller.account;
-			this._updateAppConfig(this._chainId);
-
-			return true;
-		} else {
-			return false;
-		}
-	},
-
-	_checkChainIdSupported: function (cid) {
-		return Object.values(appConfig.networks).find(network => network.chainId === cid);
-	},
-
-	_updateAppConfig: function (chainId) {
-		this._config = {
-			...this._config,
-			...appConfig.exchanges[chainId]
-		};
-	},
-
-	_updatePrice: function () {
-		const parsePrices = apiResult => {
-			const prices = {};
-
-			apiResult.map(item => {
-				return prices[item.symbol] = {
-					symbol: item.symbol,
-					price: apiResult[0].current_price / item.current_price
-				}
-			});
-
-			return prices;
-		};
-
-		const getFromLocalStorage = () => {
-			const dataStored = JSON.parse(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_STORED));
-			if (dataStored) {
-				this._config.prices = parsePrices(dataStored);
-			}
-		};
-
-		try {
-			const lastestUpdate = parseInt(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_UPDATED));
-			if (lastestUpdate > 0) {
-				getFromLocalStorage();
-			}
-
-			if (isNaN(lastestUpdate) || (new Date().getTime() - lastestUpdate) > appConfig.updateDurationMS) {
-				setTimeout(async () => {
-					try {
-						const result = await (await fetch(this._config.priceApi)).json();
-						this._config.prices = parsePrices(result);
-
-						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_STORED, JSON.stringify(result));
-						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_UPDATED, new Date().getTime());
-					} catch (fetchError) {
-						console.error(fetchError);
-					}
-				}, 1000);
-			}
-		} catch (storageError) {
-			console.error(storageError);
+		if (success) {
+			return this._getWeb3Context();
 		}
 	},
 
@@ -160,7 +93,11 @@ export const appController = {
 	},
 
 	getBTCPrice: function (token) {
-		return this._config.prices[token].price;
+		return this._config.prices ? this._config.prices[token].price : 0;
+	},
+
+	getTokenPrice: function (token) {
+		return this._config.prices ? this._config.prices[token].currentPrice : 0;
 	},
 
 	approve: async function (token, doneCallback, cancelCallback) {
@@ -233,7 +170,89 @@ export const appController = {
 		web3Controller.switchNetwork(indexOfNetwork);
 	},
 
+	shortenString: function (str, head, tail) {
+		return str.substring(0, head) + "..." + str.substring(str.length - tail);
+	},
+
+	btc2sat: function (btc) {
+		return BigNumber(btc).multipliedBy(100000000);
+	},
+
+	sat2btc: function (sat) {
+		return BigNumber(sat).dividedBy(100000000);
+	},
+
 	_loadJson: async function (url) {
 		return await (await fetch(url)).json();
+	},
+
+	_getWeb3Context: function () {
+		this._chainId = web3Controller.chainId;
+
+		if (this._checkChainIdSupported(this._chainId)) {
+			this._account = web3Controller.account;
+			this._updateAppConfig(this._chainId);
+
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+	_checkChainIdSupported: function (cid) {
+		return Object.values(appConfig.networks).find(network => network.chainId === cid);
+	},
+
+	_updateAppConfig: function (chainId) {
+		this._config = {
+			...this._config,
+			...appConfig.exchanges[chainId]
+		};
+	},
+
+	_updatePrice: function () {
+		const parsePrices = apiResult => {
+			const prices = {};
+
+			apiResult.map(item => {
+				return prices[item.symbol] = {
+					symbol: item.symbol,
+					price: apiResult[0].current_price / item.current_price,
+					currentPrice: item.current_price
+				}
+			});
+
+			return prices;
+		};
+
+		const getFromLocalStorage = () => {
+			const dataStored = JSON.parse(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_STORED));
+			if (dataStored) {
+				this._config.prices = parsePrices(dataStored);
+			}
+		};
+
+		try {
+			const lastestUpdate = parseInt(window.localStorage.getItem(globalUtils.constants.PRICE_DATA_UPDATED));
+			if (lastestUpdate > 0) {
+				getFromLocalStorage();
+			}
+
+			if (isNaN(lastestUpdate) || (new Date().getTime() - lastestUpdate) > appConfig.updateDurationMS) {
+				setTimeout(async () => {
+					try {
+						const result = await (await fetch(this._config.priceApi)).json();
+						this._config.prices = parsePrices(result);
+
+						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_STORED, JSON.stringify(result));
+						window.localStorage.setItem(globalUtils.constants.PRICE_DATA_UPDATED, new Date().getTime());
+					} catch (fetchError) {
+						console.error(fetchError);
+					}
+				}, 1000);
+			}
+		} catch (storageError) {
+			console.error(storageError);
+		}
 	}
 };

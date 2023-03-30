@@ -1,6 +1,7 @@
 import "./Header.css";
 import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
+import { Select } from "../components/Select";
 
 export const Header = ({
 	account = "",
@@ -8,40 +9,55 @@ export const Header = ({
 }) => {
 	const networks = Object.values(appConfig.networks);
 
-	const handleSwitchNetwork = event => {
-		appController.switchNetwork(event.target.selectedIndex);
+	const handleSwitchNetwork = selectedIndex => {
+		appController.switchNetwork(selectedIndex);
 	};
 
 	return <div className="headerLayout">
 		<div className="menu">
-			<h1>BCDEx</h1>
+			<img
+				src="/images/logo.png"
+				height="26px"
+				alt="logo" />
 
-			<a href="/">Lightning Network Exchange Demo</a>
+			{/* <a href="/">Lightning Network Exchange Demo</a>
 
 			<a
 				href="https://docs.bcdex.net"
 				target="_blank"
 				rel="noreferrer">Doc</a>
 
-			<a>How It Work</a>
+			<a>How It Work</a> */}
 		</div>
 
 		<div className="menu">
-			{account && <div className="label">
-				{account.substring(0, 10) + "..."}
-			</div>}
-
-			<select
+			<Select
 				onChange={handleSwitchNetwork}
-				value={(networks.find(item => item.chainId === chainId))?.chainId}>
-				{networks.map((network, index) => {
-					return <option
+				value={(networks.findIndex(item => item.chainId === chainId))}
+				options={networks.map((network, index) => {
+					return <div
+						className="optionLayout"
 						key={network.chain}
 						value={network.chainId}>
-						{network.chainName}
-					</option>
-				})}
-			</select>
+						{network.iconUrls.length > 0 && <img
+							src={network.iconUrls[0]}
+							height="16px"
+							alt="network logo" />}
+
+						<span className="title">
+							<div>{network.chainName}</div>
+							<div className="subTitle">{network.chain}</div>
+						</span>
+					</div>
+				})} />
+
+			{account && <div className="label">
+				<img src="/images/mm.png"
+					height="24px"
+					alt="metamask logo" />
+
+				{appController.shortenString(account, 5, 3)}
+			</div>}
 		</div>
 	</div>
 };
