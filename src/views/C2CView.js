@@ -103,6 +103,12 @@ export const C2CView = ({ data = null }) => {
 			() => {
 				setTimeout(() => {
 					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
+
+					setTimeout(() => {
+						if (tokenAmount.gt(0) && taker && invoice && !data?.tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
+							handleDeposit();
+						}
+					}, 1000);
 				}, 6000);
 			}
 		);
@@ -132,22 +138,49 @@ export const C2CView = ({ data = null }) => {
 
 	return <div className="subViewLayout">
 		<StringInput
-			title="LN Invoice"
+			title="Invoice"
+			tooltip="Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID."
 			onChange={handleChangeInvoice}
 			placeholder="lnbc1..."
 			qr={true} />
 
+		<div className="amountLabel">
+			<div>
+				<div>You'll get</div>
+				<div className="subTitle">(invoice amount)</div>
+			</div>
+
+			<div className="btcValue">
+				<img
+					src="/images/btc.png"
+					height="24px"
+					alt="btc" />
+
+				<div className="value">
+					<div>{btcAmount.toFixed(0)}&nbsp;sat</div>
+					<div className="subTitle">{data && appController.sat2btc(btcAmount).multipliedBy(appController.getBTCPrice("usdc")).toFixed(2)}&nbsp;USD</div>
+				</div>
+			</div>
+		</div>
+
 		<AmountInput
-			title="You Sell"
+			title="deposit"
+			tooltip="Choose what asset to deposit in exchange for the lighting invoice amount."
 			tokens={data?.tokens}
 			onTokenSelected={handleSelectToken}
 			onChange={handleChange}
 			valueForced={tokenAmount.shiftedBy(-data.tokens[tokenToSellSelected].decimals).toNumber()} />
 
+		<PriceControl
+			title="Exchange Rate"
+			tooltip="Customise the exchange rate, according to what you agreed with your exchange partner"
+			defaultPrice={price}
+			onChange={handleUpdatePrice} />
+
 		<AmountInput
 			title="You Buy"
 			tokens={[{
-				symbol: "LN BTC(Sat)",
+				symbol: "btc",
 				value: btcAmount.toFixed(0) + " SATs",
 				balance: BigNumber(Number.MAX_SAFE_INTEGER).shiftedBy(12),
 				decimals: 12
@@ -157,13 +190,9 @@ export const C2CView = ({ data = null }) => {
 			showMax={false}
 		/>
 
-		<PriceControl
-			title="USDC per WBTC (+1.17%)"
-			defaultPrice={price}
-			onChange={handleUpdatePrice} />
-
 		<StringInput
-			title="Taker Address"
+			title="Exchange Partner Address"
+			tooltip="Enter the address of your friend. He'll receive your deposit only after paying the lightning invoice."
 			onChange={handleChangeTaker}
 			placeholder="0x..." />
 

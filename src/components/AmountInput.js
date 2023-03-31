@@ -1,8 +1,13 @@
+import BigNumber from "bignumber.js";
 import { useEffect, useState } from "react";
+import { appController } from "../libs/appController";
 import "./AmountInput.css";
+import { Select } from "./Select";
+import { Tooltip } from "./Tooltip";
 
 export const AmountInput = ({
 	title = "",
+	tooltip = null,
 	tokens = [],
 	onTokenSelected = () => { },
 	balance = 0,
@@ -17,8 +22,7 @@ export const AmountInput = ({
 	const [value, setValue] = useState(min);
 	const [previousValue, setPreviousValue] = useState(min);
 
-	const handleSelectToken = event => {
-		const idx = event.target.selectedIndex;
+	const handleSelectToken = idx => {
 		setTokenSelected(idx);
 		onTokenSelected(idx);
 	};
@@ -48,19 +52,39 @@ export const AmountInput = ({
 		onChange(balance);
 	};
 
-	return <div className="amountInputLayout">
-		<div className="titleBar">
-			<div className="title">{title}</div>
+	console.debug("theToken?.symbol =", theToken?.symbol);
 
-			{showMax > 0 && <div>
+	return <div className="amountInputLayout">
+		<div className="amountInputTitleBar">
+			<div className="title">
+				{title}
+
+				{tooltip && <Tooltip content={tooltip} />}
+			</div>
+
+			{showMax > 0 && <div style={{
+				display: "flex",
+				flexDirection: "row",
+				alignItems: "center"
+			}}>
 				<span>Balance: {theToken.balance?.shiftedBy(-theToken.decimals).toFixed(0)}&nbsp;</span>
 
-				<button onClick={handleMax}>MAX</button>
+				<button
+					className="tinyButton"
+					onClick={handleMax}>Max</button>
 			</div>}
 		</div>
 
-		<div className="titleBar">
-			<select
+		<div
+			className="amountInputTitleBar"
+			style={{
+				padding: "8px 16px 8px 8px",
+				gap: "6px",
+				background: "#3C3C3C",
+				borderRadius: "12px",
+				width: "calc(100% - 24px)"
+			}}>
+			{/* <select
 				value={theToken?.symbol}
 				onChange={handleSelectToken}>
 				{tokens.map(token => {
@@ -70,17 +94,40 @@ export const AmountInput = ({
 						{token.symbol}
 					</option>
 				})}
-			</select>
+			</select> */}
+			<Select
+				value={tokenSelected}
+				onChange={handleSelectToken}
+				options={tokens.map(token => {
+					return <div
+						className="tokenOptionLayout"
+						key={token.symbol}
+						value={token.symbol}>
+						{token.logo && <img
+							src={token.logo}
+							height="24px"
+							alt="token logo" />}
 
-			<input
-				className="numberInput"
-				type="number"
-				onChange={handleChange}
-				placeholder={0}
-				value={value}
-				min={min}
-				max={maxValue}
-				style={{ color: (theToken.balance?.lt(valueForced) || theToken.balance?.lt(value)) ? "red" : "white" }} />
+						<div>
+							<div className="tokenSymbol">{token.symbol}</div>
+
+							<div className="tokenName">{token.name}</div>
+						</div>
+					</div>
+				})} />
+
+			<div className="numberInput">
+				<input
+					type="number"
+					onChange={handleChange}
+					placeholder={0}
+					value={value}
+					min={min}
+					max={maxValue}
+					style={{ color: (theToken.balance?.lt(valueForced) || theToken.balance?.lt(value)) ? "red" : "white" }} />
+
+				<div className="subValue">{theToken?.symbol && (valueForced || value) ? BigNumber((valueForced || value)).multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed() : 0}&nbsp;USD</div>
+			</div>
 		</div>
 	</div>
 };

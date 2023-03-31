@@ -9,7 +9,7 @@ export const Tab = ({
 	const [indexSelected, setIndexSelected] = useState(0);
 
 	const handleSelect = event => {
-		const idx = parseInt(event.target.id);
+		const idx = parseInt(event.target.value);
 		setIndexSelected(idx);
 		onSelect(idx);
 	};
@@ -20,13 +20,14 @@ export const Tab = ({
 				key={tab.label}
 				className="option">
 				<input
-					id={index}
+					id={"option_" + index}
 					type="radio"
 					name={name}
 					checked={index === indexSelected}
-					onChange={handleSelect} />
+					onChange={handleSelect}
+					value={index} />
 
-				<label for={index}>
+				<label htmlFor={"option_" + index}>
 					{tab.label}
 				</label>
 			</div>

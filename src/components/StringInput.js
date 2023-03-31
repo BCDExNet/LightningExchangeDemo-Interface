@@ -1,11 +1,13 @@
 import QrScanner from "qr-scanner";
 import { useEffect, useState } from "react";
 import "./AmountInput.css";
+import { Tooltip } from "./Tooltip";
 
 let qrScanner = null;
 
 export const StringInput = ({
 	title = "",
+	tooltip = null,
 	onChange = () => { },
 	placeholder = "",
 	qr = false
@@ -22,7 +24,17 @@ export const StringInput = ({
 		}, 1000);
 	};
 
-	const handleScan = event => {
+	const handleClear = () => {
+		setValue("");
+	};
+
+	const handlePaste = () => {
+		window.navigator?.clipboard?.readText && navigator?.clipboard?.readText().then(clipText => {
+			setValue(clipText);
+		})
+	};
+
+	const handleScan = () => {
 		setIsShowQR(true);
 	};
 
@@ -42,7 +54,8 @@ export const StringInput = ({
 
 						qrScanner.stop();
 						setIsShowQR(false);
-					}
+					},
+					{ highlightScanRegion: true }
 				);
 				qrScanner.start();
 			}, 1000);
@@ -58,30 +71,72 @@ export const StringInput = ({
 	};
 
 	return <div className="amountInputLayout">
-		<div className="titleBar">
-			<div className="title">{title}</div>
+		<div className="amountInputTitleBar">
+			<div className="title">
+				{title}
+
+				{tooltip && <Tooltip content={tooltip} />}
+			</div>
 		</div>
 
-		<div className="titleBar">
+		<div className="stringInput">
 
 			<input
 				type="text"
 				onChange={handleChange}
-				className="stringInput"
 				placeholder={placeholder}
 				value={value} />
 
-			{qr && <button
+			{value && <button
 				className="tinyButton"
-				onClick={handleScan}>≢</button>}
+				onClick={handleClear}>
+				<img
+					src="/images/clear.png"
+					height="16px"
+					alt="clear icon" />
+				<span>clear</span>
+			</button>}
+
+			{!value && window.navigator?.clipboard?.readText && <button
+				className="tinyButton"
+				onClick={handlePaste}>
+				<img
+					src="/images/paste_icon.png"
+					height="16px"
+					alt="paste icon" />
+				<span>paste</span>
+			</button>}
+
+			{qr && !value && <button
+				className="tinyButtonPrimary"
+				onClick={handleScan}>
+				<img
+					src="/images/scan_icon.png"
+					height="16px"
+					alt="scan icon" />
+				<span>scan</span>
+			</button>}
 		</div>
 
 		{isShowQR && <div className="scanner">
 			<video id="scanner" />
 
-			<button
-				className="fullwidthButton"
-				onClick={handleCloseScanner}>Close</button>
+			<div className="description">
+				<div className="title">
+					<img
+						src="/images/scan_icon_white.png"
+						height="16px"
+						alt="scan_icon" />
+
+					<span>Scan Lightning Invoice</span>
+				</div>
+
+				<div>Hold the invoice QR code generate inside the frame, it will be scanned automatically</div>
+
+				<button
+					className="fullwidthButtonWhite"
+					onClick={handleCloseScanner}>Close</button>
+			</div>
 		</div>}
 	</div>
 };

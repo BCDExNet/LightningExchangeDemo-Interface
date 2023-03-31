@@ -6,6 +6,8 @@ export const globalUtils = {
 		WALLET_ADD_ETHEREUM_CHAIN: "wallet_addEthereumChain",
 		BIGNUMBER_ZERO: BigNumber(0),
 		PRICE_DATA_STORED: "priceDataStored",
-		PRICE_DATA_UPDATED: "priceDataUpdated"
+		PRICE_DATA_UPDATED: "priceDataUpdated",
+		HEX_PREFIX: "0x",
+		SAT_RATE: 1000
 	}
 };

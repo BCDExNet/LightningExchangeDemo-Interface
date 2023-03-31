@@ -3,8 +3,10 @@ import { toCanvas } from "qrcode";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { StringInput } from "../components/StringInput";
+import { Tooltip } from "../components/Tooltip";
 import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
+import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./DepositInfo.css";
 
@@ -53,7 +55,11 @@ const DepositInfo = ({ chainId = 0 }) => {
 	}, [secret]);
 
 	const handleChangePreimage = val => {
-		setPreimage(val);
+		if (val.indexOf(globalUtils.constants.HEX_PREFIX) !== 0) {
+			setPreimage(globalUtils.constants.HEX_PREFIX + val);
+		} else {
+			setPreimage(val);
+		}
 	};
 
 	const handleWithdraw = event => {
@@ -66,50 +72,98 @@ const DepositInfo = ({ chainId = 0 }) => {
 	};
 
 	return <div className="depositInfoLayout">
-		<div className="item">
-			<span>Secret Hash:</span>
-			<span>{secret.substring(0, 12) + "..."}</span>
+		<h3>Check Details<Tooltip
+			sup={true}
+			content="Check that all the details are correct before paying the invoice." /></h3>
+
+		<div className="fullWidthItem">
+			<img
+				src="/images/hash_icon.png"
+				height="19px"
+				alt="hash icon" />
+
+			<div>
+				<div className="key">Deposit Secret Hash</div>
+				<div className="value">{appController.shortenString(secret, 6, 4)}</div>
+			</div>
 		</div>
 
 		{data && <>
-			<div className="item">
-				<span>Depositor:</span>
-				<span>{data.depositor.substring(0, 12) + "..."}</span>
-			</div>
+			<div className="row">
+				{theToken && <div className="halfWidthItem">
+					<div className="key">Token Name:</div>
+					<div className="value">{theToken.name}</div>
+				</div>}
 
-			<div className="item">
-				<span>Beneficiary:</span>
-				<span>{data.beneficiary.substring(0, 12) + "..."}</span>
-			</div>
-
-			{theToken && <div className="item">
-				<span>Token Name:</span>
-				<span>{theToken.name}</span>
-			</div>}
-
-			<div className="item">
-				<span>Token Address:</span>
-				<span>{data.token.substring(0, 12) + "..."}</span>
+				<div className="halfWidthItem">
+					<div className="key">Token Address:</div>
+					<div className="value">{appController.shortenString(data.token, 6, 4)}</div>
+				</div>
 			</div>
 
 			{theToken && <div className="item">
-				<span>Amount:</span>
-				<span>{BigNumber(data.amount).shiftedBy(-theToken.decimals).toFixed()}</span>
+				<div className="key">Amount</div>
+
+				{/* <div className="value">{BigNumber(data.amount).shiftedBy(-theToken.decimals).toFixed()}</div> */}
+				<div className="multiValues">
+					<span className="subValue">~{BigNumber(data.amount).shiftedBy(-theToken.decimals).multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed(2)}&nbsp;USD</span>
+
+					<span>{BigNumber(data.amount).shiftedBy(-theToken.decimals).toFixed()}&nbsp;{theToken.symbol}</span>
+
+					{theToken?.logo && <img
+						src={theToken.logo}
+						height="24px"
+						alt="token logo" />}
+				</div>
 			</div>}
 
 			<div className="item">
-				<span>Amount In Invoice:</span>
-				<span>{amountInInvoice}</span>
+				<div className="key">Depositor</div>
+				<div className="value">{appController.shortenString(data.depositor, 6, 4)}</div>
+			</div>
+
+			<div className="item">
+				<div className="key">Beneficiary</div>
+				<div className="value">{appController.shortenString(data.beneficiary, 6, 4)}</div>
+			</div>
+
+			<p />
+
+			<h3>Payment<Tooltip
+				sup={true}
+				content="Pay the invoice and receive the sum deposited by your friend." /></h3>
+
+			<div className="item">
+				<div className="key">Amount In Invoice</div>
+				<div className="value">{amountInInvoice}</div>
+			</div>
+
+			<div className="item">
+				<div className="key">Invoice ID</div>
+				<div className="value">
+					{appController.shortenString(data.invoice, 5, 3)}
+
+					{/* <button className="tinyButton">
+						<img src="/images/copy.png" height="16px" alt="copy" />
+						<span>copy</span>
+					</button> */}
+				</div>
 			</div>
 		</>}
 
-		<div style={{ textAlign: "center" }}>
+		<div style={{
+			textAlign: "center",
+			width: "100%"
+		}}>
 			<canvas id="qr" />
 		</div>
 
+		<p />
+
 		{!(data?.withdrawn) && <>
 			<StringInput
-				title="preimage/secret"
+				title="Proof of Payment (Preimage)"
+				tooltip="You can find the payment preimage in the wallet you used to pay the invoice."
 				onChange={handleChangePreimage}
 				placeholder="0x..." />
 

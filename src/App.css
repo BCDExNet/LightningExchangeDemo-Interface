@@ -1,6 +1,7 @@
 .App {
   width: 100%;
   height: 100%;
+  padding-top: 39px;
 }
 
 .appView {
@@ -11,17 +12,43 @@
   align-items: center;
 }
 
-.tinyButton {
-  padding: 0.25em 0.5em;
-  text-transform: uppercase;
-  color: white;
-  font-weight: bolder;
-  background-color: #133981;
+.tinyButtonPrimary {
   border: none;
   outline: none;
-  border-radius: 5px;
-  width: fit-content;
-  text-decoration: none;
+  padding: 2px 12px 2px 10px;
+  gap: 4px;
+  background: #F6F6F6;
+  border-radius: 8px;
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  color: #1B1B1B;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.tinyButton {
+  text-transform: capitalize;
+  padding: 3px 12px 3px 10px;
+  background: #4E4E4E;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  outline: none;
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  color: #F6F6F6;
   cursor: pointer;
 }
 
@@ -47,16 +74,33 @@
 }
 
 .fullwidthButton {
-  cursor: pointer;
-  width: 100%;
-  padding: 1em;
-  text-transform: uppercase;
-  color: white;
-  font-weight: bolder;
-  background-color: #133981;
   border: none;
   outline: none;
-  border-radius: 2em;
+  cursor: pointer;
+  width: 100%;
+  padding: 12px;
+  background: #3E3E3E;
+  border-radius: 12px;
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  color: #F6F6F6;
+}
+
+.fullwidthButtonWhite {
+  border: none;
+  outline: none;
+  padding: 12px;
+  gap: 8px;
+  width: 100%;
+  background: #F6F6F6;
+  border-radius: 12px;
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  color: #1B1B1B;
 }
 
 .fullwidthButton:disabled {
@@ -64,13 +108,29 @@
   cursor: not-allowed;
 }
 
-a {
-  text-decoration: underline;
-  cursor: pointer;
-  font-weight: bold;
-  color: white;
+.tokenOptionLayout {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5em;
 }
 
-h1 {
-  font-size: xx-large;
+.tokenOptionLayout .tokenSymbol {
+  text-transform: uppercase;
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  color: #FFFFFF;
+}
+
+.tokenOptionLayout .tokenName {
+  font-family: 'Lexend', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  color: #FFFFFF;
+  opacity: 0.6;
+  text-transform: capitalize;
 }

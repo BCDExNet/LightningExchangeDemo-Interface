@@ -2,6 +2,7 @@ import { lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { appController } from './libs/appController';
+import { Footer } from './views/Footer';
 import { Header } from './views/Header';
 import { MainView } from './views/MainView';
 
@@ -75,6 +76,10 @@ function App() {
           </Routes>
         </BrowserRouter>
       </div>
+
+      <p />
+
+      <Footer />
     </div>
   );
 }

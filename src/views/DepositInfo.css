@@ -1,12 +1,75 @@
 .depositInfoLayout {
-	padding: 1em;
 	margin-top: 2em;
-	width: 480px;
-	background-color: #0a1e67;
-	border-radius: 1em;
 	display: flex;
 	flex-direction: column;
-	row-gap: 1em;
+	align-items: flex-start;
+	padding: 24px;
+	row-gap: 12px;
+	isolation: isolate;
+	background: #1B1B1B;
+	border-radius: 16px;
+}
+
+.depositInfoLayout .row {
+	width: 100%;
+	flex: 1 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	column-gap: 12px;
+}
+
+.depositInfoLayout .halfWidthItem {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	padding: 12px 8px 12px 12px;
+	row-gap: 6px;
+	background: #3E3E3E;
+	border-radius: 8px;
+	width: 100%;
+}
+
+.depositInfoLayout .fullWidthItem {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	padding: 12px 8px 12px 12px;
+	column-gap: 10px;
+	background: #3E3E3E;
+	border-radius: 8px;
+	width: calc(100% - 20px);
+}
+
+.depositInfoLayout .fullWidthItem div {
+	display: flex;
+	flex-direction: column;
+	row-gap: 6px;
+}
+
+.depositInfoLayout .key {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 10px;
+	color: #FFFFFF;
+	opacity: 0.6;
+	text-transform: capitalize;
+}
+
+.depositInfoLayout .value {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 14px;
+	color: #FFFFFF;
+	display: flex;
+	flex-direction: row;
+	column-gap: 0.5em;
+	align-items: center;
 }
 
 .depositInfoLayout .item {
@@ -15,6 +78,27 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+}
+
+.depositInfoLayout .item .multiValues {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	column-gap: 0.5em;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 14px;
+	color: #F6F6F6;
+}
+
+.depositInfoLayout .item .multiValues .subValue {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 10px;
+	color: #A3A3A3;
 }
 
 .depositInfoLayout .item span:first-child {

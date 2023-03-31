@@ -1,7 +1,6 @@
 .amountInputLayout {
-	margin: 1em 0;
-	padding: 1em;
-	background-color: #041135;
+	margin: 0;
+	/* padding: 1em; */
 	border-radius: 1em;
 	row-gap: 0.5em;
 	display: flex;
@@ -10,15 +9,40 @@
 
 .amountInputLayout .scanner {
 	position: fixed;
-	top: 20px;
-	right: 20px;
-	width: 200px;
-	height: 200px;
+	top: 0;
+	right: 0;
+	width: 100vw;
+	height: 100vh;
+	font-family: 'Lexend', sans-serif;
+	z-index: 100;
+}
+
+.amountInputLayout .scanner .description {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 24px;
+	gap: 18px;
+	width: 276px;
+	left: 32px;
+	top: calc(50% - 230px/2);
+	background: #1B1B1B;
+	border-radius: 24px;
+	position: absolute;
+}
+
+.amountInputLayout .scanner .description .title {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+	text-transform: capitalize;
 }
 
 .amountInputLayout .scanner #scanner {
-	width: 200px;
-	height: 200px;
+	width: 100%;
+	height: 100%;
 }
 
 .amountInputLayout .line {
@@ -26,45 +50,102 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	column-gap: 0.5em;
 }
 
-.amountInputLayout .titleBar {
-	display: flex;
+.amountInputLayout .amountInputTitleBar {
 	width: 100%;
+	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.amountInputLayout .amountInputTitleBar .values {
+	font-family: 'Lexend', sans-serif;
+	text-align: right;
+}
+
+.amountInputLayout .amountInputTitleBar .values .subValue {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 10px;
+	color: #FFFFFF;
+	opacity: 0.6;
+}
+
+.amountInputLayout .amountInputTitleBar .balanceBar {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 700;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-transform: capitalize;
+}
+
+.amountInputLayout .amountInputTitleBar .title {
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 20px;
+	text-transform: capitalize;
+	color: #FFFFFF;
+	display: flex;
 	align-items: center;
 }
 
-.amountInputLayout .titleBar .title {
-	text-transform: capitalize;
-	font-weight: bold;
-	color: white;
+.amountInputLayout .amountInputTitleBar .numberInput {
+	width: 100%;
+	flex: 1 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-end;
+	row-gap: 4px;
 }
 
-.amountInputLayout .titleBar .numberInput {
-	flex: 1 1;
+.amountInputLayout .amountInputTitleBar .numberInput input {
+	width: 100%;
 	background-color: transparent;
 	padding: 0.25em;
-	color: white;
 	border: none;
 	outline: none;
 	text-align: right;
-	font-size: x-large;
 	appearance: textfield;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 16px;
+	color: #FFFFFF;
 }
 
-.amountInputLayout .titleBar .numberInput::-webkit-inner-spin-button {
+.amountInputLayout .amountInputTitleBar .numberInput input::-webkit-inner-spin-button {
 	appearance: none;
 }
 
-.amountInputLayout .titleBar .stringInput {
+.amountInputLayout .stringInput {
+	padding: 6px 6px 6px 12px;
+	background: #3E3E3E;
+	border-radius: 12px;
+	font-family: 'Lexend', sans-serif;
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	display: flex;
+	flex-direction: row;
+	gap: 0.5em;
 	flex: 1 1;
-	background-color: transparent;
-	padding: 0.25em;
-	color: white;
+	width: 532px;
+}
+
+.amountInputLayout .stringInput input {
 	border: none;
 	outline: none;
-	font-size: x-large;
 	appearance: textfield;
+	background-color: transparent;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	color: #F6F6F6;
 }
