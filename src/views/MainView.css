@@ -86,6 +86,19 @@
 	border-radius: 16px;
 }
 
+.mainViewLayout .orderItem .headerLine {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.mainViewLayout .orderItem .buttons {
+	display: flex;
+	justify-content: space-between;
+	column-gap: 1em;
+	flex: 1 1;
+}
+
 .mainViewLayout .orderItem .statusLabel {
 	display: flex;
 	flex-direction: row;
@@ -120,25 +133,24 @@
 	color: #A3A3A3;
 }
 
-.mainViewLayout .orderItem div {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: center;
-}
+@media (max-width: 428px) {
+	.appContainer {
+		width: 100%;
+	}
 
-.mainViewLayout .orderItem div .key {
-	font-family: 'Lexend', sans-serif;
-	font-style: normal;
-	font-weight: 400;
-	font-size: 12px;
-	color: #A3A3A3;
-}
+	.appContainer .container {
+		flex-direction: column;
+		row-gap: 1em;
+	}
 
-.mainViewLayout .orderItem div .value {
-	font-family: 'Lexend', sans-serif;
-	font-style: normal;
-	font-weight: 400;
-	font-size: 14px;
-	color: #F6F6F6;
+	.mainViewLayout {
+		width: calc(100% - 48px);
+	}
+
+	.mainViewLayout .orderItem .buttons {
+		display: flex;
+		justify-content: space-between;
+		column-gap: 1em;
+		flex: 1 1;
+	}
 }

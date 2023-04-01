@@ -8,10 +8,11 @@ body {
   background-repeat: no-repeat;
   color: gainsboro;
   padding: 0;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: 'Lexend', sans-serif;
+  width: 100vw;
 }
 
 a {
