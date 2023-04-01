@@ -2,6 +2,8 @@ import BigNumber from "bignumber.js";
 import { toCanvas } from "qrcode";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { KeyAndValueInLine } from "../components/KeyAndValueInLine";
+import { SecretHashLabel } from "../components/SecretHashLabel";
 import { StringInput } from "../components/StringInput";
 import { Tooltip } from "../components/Tooltip";
 import { appConfig } from "../configs/appConfig";
@@ -76,17 +78,7 @@ const DepositInfo = ({ chainId = 0 }) => {
 			sup={true}
 			content="Check that all the details are correct before paying the invoice." /></h3>
 
-		<div className="fullWidthItem">
-			<img
-				src="/images/hash_icon.png"
-				height="19px"
-				alt="hash icon" />
-
-			<div>
-				<div className="key">Deposit Secret Hash</div>
-				<div className="value">{appController.shortenString(secret, 6, 4)}</div>
-			</div>
-		</div>
+		<SecretHashLabel secret={secret} />
 
 		{data && <>
 			<div className="row">
@@ -101,11 +93,9 @@ const DepositInfo = ({ chainId = 0 }) => {
 				</div>
 			</div>
 
-			{theToken && <div className="item">
-				<div className="key">Amount</div>
-
-				{/* <div className="value">{BigNumber(data.amount).shiftedBy(-theToken.decimals).toFixed()}</div> */}
-				<div className="multiValues">
+			{theToken && <KeyAndValueInLine
+				keyStr="amount"
+				value={<div className="multiValues">
 					<span className="subValue">~{BigNumber(data.amount).shiftedBy(-theToken.decimals).multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed(2)}&nbsp;USD</span>
 
 					<span>{BigNumber(data.amount).shiftedBy(-theToken.decimals).toFixed()}&nbsp;{theToken.symbol}</span>
@@ -114,18 +104,15 @@ const DepositInfo = ({ chainId = 0 }) => {
 						src={theToken.logo}
 						height="24px"
 						alt="token logo" />}
-				</div>
-			</div>}
+				</div>} />}
 
-			<div className="item">
-				<div className="key">Depositor</div>
-				<div className="value">{appController.shortenString(data.depositor, 6, 4)}</div>
-			</div>
+			<KeyAndValueInLine
+				keyStr="depositor"
+				value={appController.shortenString(data.depositor, 6, 4)} />
 
-			<div className="item">
-				<div className="key">Beneficiary</div>
-				<div className="value">{appController.shortenString(data.beneficiary, 6, 4)}</div>
-			</div>
+			<KeyAndValueInLine
+				keyStr="Beneficiary"
+				value={appController.shortenString(data.beneficiary, 6, 4)} />
 
 			<p />
 
@@ -133,22 +120,20 @@ const DepositInfo = ({ chainId = 0 }) => {
 				sup={true}
 				content="Pay the invoice and receive the sum deposited by your friend." /></h3>
 
-			<div className="item">
-				<div className="key">Amount In Invoice</div>
-				<div className="value">{amountInInvoice}</div>
-			</div>
+			<KeyAndValueInLine
+				keyStr="Amount In Invoice"
+				value={amountInInvoice} />
 
-			<div className="item">
-				<div className="key">Invoice ID</div>
-				<div className="value">
+			<KeyAndValueInLine
+				keyStr="Invoice ID"
+				value={<div className="value">
 					{appController.shortenString(data.invoice, 5, 3)}
 
 					{/* <button className="tinyButton">
-						<img src="/images/copy.png" height="16px" alt="copy" />
-						<span>copy</span>
-					</button> */}
-				</div>
-			</div>
+				<img src="/images/copy.png" height="16px" alt="copy" />
+				<span>copy</span>
+			</button> */}
+				</div>} />
 		</>}
 
 		<div style={{

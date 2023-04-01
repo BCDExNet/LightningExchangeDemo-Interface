@@ -1,0 +1,25 @@
+.modalMask {
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	background: rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.modalMask .modalContainer {
+	padding: 24px;
+	isolation: isolate;
+	background: #1B1B1B;
+	border-radius: 16px;
+	position: relative;
+}
+
+.modalMask .modalContainer .closeButton {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+}

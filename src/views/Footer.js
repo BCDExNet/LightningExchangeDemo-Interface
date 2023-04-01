@@ -1,14 +1,26 @@
+import { useEffect, useState } from "react";
 import { LinkWithIcon } from "../components/LinkWithIcon";
 import "./Footer.css";
 
 export const Footer = () => {
-	return <div className="footerLayout">
-		<img
-			src="/images/logo.png"
-			height="26px"
-			alt="logo" />
+	const [pageIsShort, setPageIsShort] = useState(false);
 
-		<div>
+	useEffect(() => {
+		window.addEventListener("resize", () => {
+			setPageIsShort(document.body.clientHeight < window.innerHeight);
+		});
+	}, []);
+
+	return <>
+		<div
+			id="theFooter"
+			className="footerLayout"
+			style={{ position: pageIsShort ? "absolute" : "relative" }}>
+			<img
+				src="/images/logo.png"
+				height="26px"
+				alt="logo" />
+
 			<div className="menus">
 				<LinkWithIcon
 					icon="/images/docs.png"
@@ -30,8 +42,8 @@ export const Footer = () => {
 					label="github"
 					url="https://github.com" />
 			</div>
-
-			<div className="copyright">© BCDEX 2023</div>
 		</div>
-	</div>
+
+		<div className="copyright">© BCDEX 2023</div>
+	</>
 };

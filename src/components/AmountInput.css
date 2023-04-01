@@ -149,3 +149,9 @@
 	width: 100%;
 	color: #F6F6F6;
 }
+
+@media (max-width: 428px) {
+	.amountInputLayout .stringInput {
+		width: 100%;
+	}
+}

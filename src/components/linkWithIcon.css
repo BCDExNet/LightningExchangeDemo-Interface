@@ -7,7 +7,7 @@
 	color: #FFFFFF;
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: flex-start;
 	align-items: center;
 	column-gap: 10px;
 	text-transform: capitalize;

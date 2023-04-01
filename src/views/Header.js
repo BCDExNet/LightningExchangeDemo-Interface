@@ -2,6 +2,7 @@ import "./Header.css";
 import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
 import { Select } from "../components/Select";
+import { Menu } from "../components/Menu";
 
 export const Header = ({
 	account = "",
@@ -56,8 +57,12 @@ export const Header = ({
 					height="24px"
 					alt="metamask logo" />
 
-				{appController.shortenString(account, 5, 3)}
+				<span>
+					{appController.shortenString(account, 5, 3)}
+				</span>
 			</div>}
+
+			<Menu />
 		</div>
 	</div>
 };

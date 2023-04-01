@@ -77,8 +77,6 @@ function App() {
         </BrowserRouter>
       </div>
 
-      <p />
-
       <Footer />
     </div>
   );

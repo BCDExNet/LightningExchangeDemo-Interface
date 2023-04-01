@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
 import { useEffect, useState } from "react";
+import { KeyAndValueInLine } from "../components/KeyAndValueInLine";
 import { Tab } from "../components/Tab";
 import { Tooltip } from "../components/Tooltip";
 import { appConfig } from "../configs/appConfig";
@@ -81,7 +82,7 @@ export const MainView = ({ data = null }) => {
 					return <div
 						key={deposit.secret}
 						className="orderItem">
-						<div>
+						<div className="headerLine">
 							<div className="keyAndValue">
 								{theToken?.logo && <img
 									src={theToken.logo}
@@ -103,22 +104,15 @@ export const MainView = ({ data = null }) => {
 							</div>
 						</div>
 
-						<div>
-							<span className="key">Beneficiary</span>
-							<span className="value">{deposit.beneficiary}</span>
-						</div>
+						<KeyAndValueInLine
+							keyStr="Beneficiary"
+							value={deposit.beneficiary} />
 
-						<div>
-							<span className="key">Deadline</span>
-							<span>{new Date(deposit.deadline * 1000).toLocaleString()}</span>
-						</div>
+						<KeyAndValueInLine
+							keyStr="deadline"
+							value={new Date(deposit.deadline * 1000).toLocaleString()} />
 
-						<div style={{
-							display: "flex",
-							justifyContent: "space-between",
-							columnGap: "1em",
-							flex: "1 1"
-						}}>
+						<div className="buttons">
 							<button
 								className="fullwidthButton"
 								id={deposit.secret}
