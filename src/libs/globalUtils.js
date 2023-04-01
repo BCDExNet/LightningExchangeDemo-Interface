@@ -8,6 +8,12 @@ export const globalUtils = {
 		PRICE_DATA_STORED: "priceDataStored",
 		PRICE_DATA_UPDATED: "priceDataUpdated",
 		HEX_PREFIX: "0x",
-		SAT_RATE: 1000
+		SAT_RATE: 1000,
+		SOMETHING_WRONG: "Something Went Wrong!"
+	},
+	messageType: {
+		ERROR: 0,
+		INFO: 1,
+		DONE: 2
 	}
 };

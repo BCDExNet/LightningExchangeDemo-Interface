@@ -6,7 +6,9 @@ import { appConfig } from "../configs/appConfig";
 import { appController } from "../libs/appController";
 import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
+import { MessageModal } from "./MessageModal";
 import "./MainView.css";
+import { DepositModal } from "./DepositModal";
 
 export const B2CView = ({ data = null }) => {
 	const taker = appController.config.b2cTaker;
@@ -16,6 +18,8 @@ export const B2CView = ({ data = null }) => {
 	const [expiry, setExpiry] = useState(0);
 	const [secretHash, setSecretHash] = useState("");
 	const [tokenToSellSelected, setTokenToSellSelected] = useState(0);
+	const [error, setError] = useState(null);
+	const [showDepositeModal, setShowDepositeModal] = useState(false);
 
 	const updateTokenData = async index => {
 		const theToken = data.tokens[index];
@@ -26,7 +30,11 @@ export const B2CView = ({ data = null }) => {
 
 	const recomputeAmountToSell = (index, sats) => {
 		const theToken = data.tokens[index];
-		const howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
+		let howMuchToken = globalUtils.constants.BIGNUMBER_ZERO;
+
+		if (sats > 0) {
+			howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
+		}
 		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
 		theToken.deficit = howMuchToken.gt(theToken.balance);
 
@@ -38,6 +46,14 @@ export const B2CView = ({ data = null }) => {
 			updateTokenData(0);
 		}
 	}, [data]);
+
+	const init = () => {
+		setBTCAmount(0);
+		setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO);
+		setExpiry(0);
+		setSecretHash("");
+		recomputeAmountToSell(tokenToSellSelected, 0);
+	};
 
 	const handleChangeInvoice = val => {
 		try {
@@ -52,14 +68,18 @@ export const B2CView = ({ data = null }) => {
 				setSecretHash("0x" + decoded.paymentHash);
 				setInvoice(val);
 			} else {
-				window.alert("Amount is 0 or more than " + appConfig.btcLimit);
+				setError({
+					title: globalUtils.constants.SOMETHING_WRONG,
+					text: "Amount is 0 or more than " + appConfig.btcLimit
+				});
 
-				setBTCAmount(0);
-				setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO);
-				setExpiry(0);
-				setSecretHash("");
+				init();
 			}
 		} catch (error) {
+			setError({
+				title: globalUtils.constants.SOMETHING_WRONG,
+				text: error.message
+			});
 			console.error(error);
 		}
 	};
@@ -90,8 +110,8 @@ export const B2CView = ({ data = null }) => {
 			expiry,
 			invoice,
 			() => {
-				window.alert("deposit successfully! secretHash = " + secretHash);
-				// window.location.reload();
+				// window.alert("deposit successfully! secretHash = " + secretHash);
+				setShowDepositeModal(true);
 			}
 		);
 	};
@@ -102,44 +122,73 @@ export const B2CView = ({ data = null }) => {
 		recomputeAmountToSell(idx, btcAmount);
 	};
 
-	return <div className="subViewLayout">
-		<StringInput
-			title="Invoice"
-			tooltip="Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID."
-			onChange={handleChangeInvoice}
-			placeholder="lnbc1..."
-			qr={true} />
+	const handleCloseError = () => {
+		setError(null);
+		init();
+	}
 
-		<div className="amountLabel">
-			<div>
-				<div>You'll get</div>
-				<div className="subTitle">(invoice amount)</div>
-			</div>
+	const handleCloseDepositeModal = () => {
+		setShowDepositeModal(false);
+		init();
+	};
 
-			<div className="btcValue">
-				<img
-					src="/images/btc.png"
-					height="24px"
-					alt="btc" />
+	const handleClearInvoice = () => {
+		init();
+	};
 
-				<div className="value">
-					<div>{btcAmount.toFixed(0)}&nbsp;sat</div>
-					<div className="subTitle">{data && appController.sat2btc(btcAmount).multipliedBy(appController.getBTCPrice("usdc")).toFixed(2)}&nbsp;USD</div>
+	return <>
+		<div className="subViewLayout">
+			<StringInput
+				title="Invoice"
+				tooltip="Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID."
+				onChange={handleChangeInvoice}
+				placeholder="lnbc1..."
+				qr={true}
+				onClear={handleClearInvoice} />
+
+			<div className="amountLabel">
+				<div>
+					<div>You'll get</div>
+					<div className="subTitle">(invoice amount)</div>
+				</div>
+
+				<div className="btcValue">
+					<img
+						src="/images/btc.png"
+						height="24px"
+						alt="btc" />
+
+					<div className="value">
+						<div>{btcAmount.toFixed(0)}&nbsp;sat</div>
+						<div className="subTitle">{data && appController.sat2btc(btcAmount).multipliedBy(appController.getBTCPrice("usdc")).toFixed(2)}&nbsp;USD</div>
+					</div>
 				</div>
 			</div>
+
+			<AmountLabel
+				title="deposit"
+				tooltip="Choose what asset to deposit in exchange for the lighting invoice amount."
+				tokens={data?.tokens}
+				onTokenSelected={handleSelectToken} />
+
+			{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
+				className="fullwidthButton"
+				onClick={handleApprove}>Approve</button> : <button
+					className="fullwidthButton"
+					onClick={handleDeposit}
+					disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}
 		</div>
 
-		<AmountLabel
-			title="deposit"
-			tooltip="Choose what asset to deposit in exchange for the lighting invoice amount."
-			tokens={data?.tokens}
-			onTokenSelected={handleSelectToken} />
+		{error && <MessageModal
+			title={error.title}
+			text={error.text}
+			onClick={handleCloseError} />}
 
-		{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
-			className="fullwidthButton"
-			onClick={handleApprove}>Approve</button> : <button
-				className="fullwidthButton"
-				onClick={handleDeposit}
-				disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}
-	</div>
+		{showDepositeModal && <DepositModal
+			onClose={handleCloseDepositeModal}
+			secret={secretHash}
+			deposited={tokenAmount.toString()}
+			depositor={appController.shortenString(data.account, 4, 4)}
+			beneficiary={appController.shortenString(taker, 4, 4)} />}
+	</>
 };

@@ -116,6 +116,10 @@
   cursor: not-allowed;
 }
 
+.fullwidthButtonWhite:disabled {
+  cursor: not-allowed;
+}
+
 .tokenOptionLayout {
   display: flex;
   flex-direction: row;

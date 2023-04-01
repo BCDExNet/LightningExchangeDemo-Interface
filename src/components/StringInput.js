@@ -10,7 +10,8 @@ export const StringInput = ({
 	tooltip = null,
 	onChange = () => { },
 	placeholder = "",
-	qr = false
+	qr = false,
+	onClear = () => { }
 }) => {
 	const [value, setValue] = useState("");
 	const [isShowQR, setIsShowQR] = useState(false);
@@ -26,6 +27,7 @@ export const StringInput = ({
 
 	const handleClear = () => {
 		setValue("");
+		onClear();
 	};
 
 	const handlePaste = () => {
@@ -49,8 +51,8 @@ export const StringInput = ({
 				qrScanner = new QrScanner(
 					document.getElementById("scanner"),
 					result => {
-						setValue(result);
-						onChange(result);
+						setValue(result.data);
+						onChange(result.data);
 
 						qrScanner.stop();
 						setIsShowQR(false);

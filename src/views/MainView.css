@@ -35,6 +35,17 @@
 	color: #F6F6F6;
 }
 
+.mainViewLayout .scrollBox {
+	width: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	max-height: 535px;
+	height: fit-content;
+	display: flex;
+	flex-direction: column;
+	row-gap: 1em;
+}
+
 .mainViewLayout .subViewLayout {
 	display: flex;
 	flex-direction: column;
