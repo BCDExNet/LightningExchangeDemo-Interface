@@ -1,0 +1,18 @@
+.errorModalLayout {
+	display: flex;
+	flex-direction: column;
+	row-gap: 18px;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-left: 1em;
+	margin-right: 1em;
+	width: calc(100% - 2em);
+}
+
+.errorModalLayout .text {
+	font-style: normal;
+	font-weight: 400;
+	font-size: 14px;
+	line-height: 22px;
+	color: #FFFFFF;
+}
