@@ -31,20 +31,10 @@ export const AmountLabel = ({
 		</div>
 
 		<div className="amountInputTitleBar">
-			{/* <select
-				value={theToken?.symbol}
-				onChange={handleSelectToken}>
-				{tokens.map(token => {
-					return <option
-						key={token.symbol}
-						value={token.symbol}>
-						{token.symbol}
-					</option>
-				})}
-			</select> */}
 			<Select
 				value={tokenSelected}
 				onChange={handleSelectToken}
+				showCheckIcon={false}
 				options={tokens.map(token => {
 					return <div
 						className="tokenOptionLayout"

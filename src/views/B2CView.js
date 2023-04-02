@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { useEffect, useState } from "react";
 import { AmountLabel } from "../components/AmountLabel";
 import { StringInput } from "../components/StringInput";
@@ -20,16 +19,17 @@ export const B2CView = ({ data = null }) => {
 	const [tokenToSellSelected, setTokenToSellSelected] = useState(0);
 	const [error, setError] = useState(null);
 	const [showDepositeModal, setShowDepositeModal] = useState(false);
+	const tokens = data?.tokens ?? [];
 
 	const updateTokenData = async index => {
-		const theToken = data.tokens[index];
+		const theToken = tokens[index];
 		const result = await appController.getDataWithToken(theToken.symbol);
 		theToken.allowance = result.allowance;
 		theToken.balance = result.balance;
 	};
 
 	const recomputeAmountToSell = (index, sats) => {
-		const theToken = data.tokens[index];
+		const theToken = tokens[index];
 		let howMuchToken = globalUtils.constants.BIGNUMBER_ZERO;
 
 		if (sats > 0) {
@@ -40,6 +40,15 @@ export const B2CView = ({ data = null }) => {
 
 		setTokenAmount(howMuchToken.integerValue());
 	};
+
+	useEffect(() => {
+		return () => {
+			tokens.forEach(item => {
+				item.value = null;
+				item.deficit = false
+			});
+		}
+	}, []);
 
 	useEffect(() => {
 		if (data) {
@@ -86,13 +95,13 @@ export const B2CView = ({ data = null }) => {
 
 	const handleApprove = () => {
 		appController.approve(
-			data?.tokens[tokenToSellSelected].symbol,
+			tokens[tokenToSellSelected]?.symbol,
 			() => {
 				setTimeout(() => {
 					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
 
 					setTimeout(() => {
-						if (tokenAmount.gt(0) && taker && invoice && !data?.tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
+						if (tokenAmount.gt(0) && taker && invoice && !tokens[tokenToSellSelected]?.deficit && secretHash && expiry > 0) {
 							handleDeposit();
 						}
 					}, 1000);
@@ -103,15 +112,20 @@ export const B2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			data?.tokens[tokenToSellSelected].symbol,
+			tokens[tokenToSellSelected]?.symbol,
 			tokenAmount.toString(),
 			taker,
 			secretHash,
 			expiry,
 			invoice,
 			() => {
-				// window.alert("deposit successfully! secretHash = " + secretHash);
 				setShowDepositeModal(true);
+			},
+			error => {
+				setError({
+					title: globalUtils.constants.SOMETHING_WRONG,
+					text: error.message
+				});
 			}
 		);
 	};
@@ -168,16 +182,16 @@ export const B2CView = ({ data = null }) => {
 			<AmountLabel
 				title="deposit"
 				tooltip="Choose what asset to deposit in exchange for the lighting invoice amount."
-				tokens={data?.tokens}
+				tokens={tokens}
 				onTokenSelected={handleSelectToken} />
 
-			{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
+			{tokens[tokenToSellSelected]?.allowance?.lt(tokenAmount) ? <button
 				className="fullwidthButton"
 				onClick={handleApprove}
 				disabled={!data?.account}>Approve</button> : <button
 					className="fullwidthButton"
 					onClick={handleDeposit}
-					disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}
+					disabled={tokenAmount.eq(0) || !taker || !invoice || tokens[tokenToSellSelected]?.deficit}>Deposit</button>}
 		</div>
 
 		{error && <MessageModal

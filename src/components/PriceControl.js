@@ -13,11 +13,11 @@ export const PriceControl = ({
 	const [price, setPrice] = useState(defaultPrice);
 
 	useEffect(() => {
-		originPrice = defaultPrice;
-	}, []);
-
-	useEffect(() => {
 		setPrice(defaultPrice);
+
+		if (originPrice === 0) {
+			originPrice = defaultPrice;
+		}
 	}, [defaultPrice]);
 
 	const updatePrice = newPrice => {
@@ -53,7 +53,7 @@ export const PriceControl = ({
 		</div>
 
 		<div className="line">
-			<span>{price}</span>
+			<span>{price.toFixed(2)}</span>
 
 			<button
 				className="tinyButton"

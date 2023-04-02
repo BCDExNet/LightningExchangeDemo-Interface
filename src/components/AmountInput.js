@@ -10,7 +10,7 @@ export const AmountInput = ({
 	tooltip = null,
 	tokens = [],
 	onTokenSelected = () => { },
-	balance = 0,
+	// balance = 0,
 	showMax = true,
 	onChange = () => { },
 	min = 1,
@@ -47,9 +47,10 @@ export const AmountInput = ({
 		}, 1000);
 	};
 
-	const handleMax = event => {
-		setValue(balance);
-		onChange(balance);
+	const handleMax = () => {
+		const val = theToken.balance?.shiftedBy(-theToken.decimals).toNumber();
+		setValue(val);
+		onChange(val);
 	};
 
 	return <div className="amountInputLayout">
@@ -65,7 +66,7 @@ export const AmountInput = ({
 				flexDirection: "row",
 				alignItems: "center"
 			}}>
-				<span>Balance: {theToken.balance?.shiftedBy(-theToken.decimals).toFixed(0)}&nbsp;</span>
+				<span>Balance: {theToken.balance?.shiftedBy(-theToken.decimals).toFixed()}&nbsp;</span>
 
 				<button
 					className="tinyButton"
@@ -82,20 +83,10 @@ export const AmountInput = ({
 				borderRadius: "12px",
 				width: "calc(100% - 24px)"
 			}}>
-			{/* <select
-				value={theToken?.symbol}
-				onChange={handleSelectToken}>
-				{tokens.map(token => {
-					return <option
-						key={token.symbol}
-						value={token.symbol}>
-						{token.symbol}
-					</option>
-				})}
-			</select> */}
 			<Select
 				value={tokenSelected}
 				onChange={handleSelectToken}
+				showCheckIcon={false}
 				options={tokens.map(token => {
 					return <div
 						className="tokenOptionLayout"
@@ -122,9 +113,9 @@ export const AmountInput = ({
 					value={value}
 					min={min}
 					max={maxValue}
-					style={{ color: (theToken.balance?.lt(valueForced) || theToken.balance?.lt(value)) ? "red" : "white" }} />
+					style={{ color: (theToken?.deficit || theToken.balance?.lt(valueForced) || theToken.balance?.lt(value)) ? "red" : "white" }} />
 
-				<div className="subValue">{theToken?.symbol && (valueForced || value) ? BigNumber((valueForced || value)).multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed() : 0}&nbsp;USD</div>
+				<div className="subValue">{theToken?.symbol && (valueForced || value) ? BigNumber((valueForced || value)).multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed(2) : 0}&nbsp;USD</div>
 			</div>
 		</div>
 	</div>

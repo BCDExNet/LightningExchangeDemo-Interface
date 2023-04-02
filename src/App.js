@@ -2,6 +2,7 @@ import { lazy, useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { appController } from './libs/appController';
+import { globalUtils } from './libs/globalUtils';
 import { Footer } from './views/Footer';
 import { Header } from './views/Header';
 import { MainView } from './views/MainView';
@@ -59,7 +60,13 @@ function App() {
     const init = async () => {
       turnTimerOff();
 
-      const networkSupported = await appController.init();
+      let networkSupported = false;
+      if (parseInt(window.localStorage.getItem(globalUtils.constants.AUTOCONNECT)) === 1) {
+        networkSupported = await appController.init(updateWeb3);
+        // window.localStorage.removeItem(globalUtils.constants.AUTOCONNECT);
+      } else {
+        networkSupported = await appController.init();
+      }
       checkNetwork(networkSupported);
     };
 
