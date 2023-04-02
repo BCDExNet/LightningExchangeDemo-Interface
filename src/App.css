@@ -109,6 +109,8 @@
   font-weight: 700;
   font-size: 16px;
   color: #1B1B1B;
+  cursor: pointer;
+  text-transform: capitalize;
 }
 
 .fullwidthButton:disabled {

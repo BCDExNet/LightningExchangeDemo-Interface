@@ -10,6 +10,7 @@ import { B2CView } from "./B2CView";
 import { C2CView } from "./C2CView";
 import "./MainView.css";
 import { MessageModal } from "./MessageModal";
+import { WithdrawModal } from "./WithdrawModal";
 
 const tabs = [
 	{
@@ -24,6 +25,9 @@ export const MainView = ({ data = null }) => {
 	const [IndexOfMainTab, setIndexOfMainTab] = useState(0);
 	const [deposits, setDeposits] = useState([]);
 	const [infoObj, setInfoObj] = useState(null);
+	const [isShowWithdrawModal, setIsShowWithdrawModal] = useState(false);
+	const [currentWithdrawAmount, setCurrentWithdrawAmount] = useState("");
+	const [txId, setTxId] = useState("");
 
 	useEffect(() => {
 		if (!data?.orders) {
@@ -33,9 +37,11 @@ export const MainView = ({ data = null }) => {
 		const getter = async () => {
 			const tempArray = [];
 			for (let i = 0; i < data.orders.length; i++) {
-				const id = data.orders[i];
+				const theDeposit = data.orders[i];
+				const id = theDeposit.hash;
 				const result = await appController.getDepositInfo(id);
 				result.secret = id;
+				result.sent = theDeposit.sent;
 				tempArray.push(result);
 			}
 			setDeposits(tempArray);
@@ -49,8 +55,6 @@ export const MainView = ({ data = null }) => {
 	};
 
 	const handleRefund = event => {
-		console.debug("handleRefund()");
-
 		appController.refund(
 			event.currentTarget.id,
 			() => {
@@ -70,9 +74,32 @@ export const MainView = ({ data = null }) => {
 		);
 	};
 
+	const handleWithdraw = event => {
+		setCurrentWithdrawAmount(event.currentTarget.dataset.amount);
+
+		appController.withdraw(
+			event.currentTarget.id,
+			tx => {
+				setTxId(tx);
+				setIsShowWithdrawModal(true);
+			},
+			err => {
+				setInfoObj({
+					type: globalUtils.messageType.ERROR,
+					title: globalUtils.constants.SOMETHING_WRONG,
+					text: err.message
+				});
+			}
+		);
+	};
+
 	const handleCloseMessageModal = () => {
 		setInfoObj(null);
 	}
+
+	const handleCloseWithdrawModal = () => {
+		setIsShowWithdrawModal(false);
+	};
 
 	return <>
 		<div className="appContainer">
@@ -100,6 +127,7 @@ export const MainView = ({ data = null }) => {
 					<div className="scrollBox">
 						{deposits.map(deposit => {
 							const theToken = Object.values(appConfig.exchanges[data?.chainId].tokens).find(item => item.address.toLocaleLowerCase() === deposit.token.toLocaleLowerCase());
+							const theDepositAmount = BigNumber(deposit.amount).shiftedBy(-theToken.decimals);
 
 							return <div
 								key={deposit.secret}
@@ -111,18 +139,18 @@ export const MainView = ({ data = null }) => {
 											height="24px"
 											alt="token logo" />}
 
-										<span>{BigNumber(deposit.amount).shiftedBy(-theToken.decimals).toFixed()}&nbsp;{theToken.symbol}</span>
+										<span>{theDepositAmount.toFixed()}&nbsp;{theToken.symbol}</span>
 
-										<span className="subValue">~{BigNumber(deposit.amount).shiftedBy(-theToken.decimals).multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed()}&nbsp;USD</span>
+										<span className="subValue">~{theDepositAmount.multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed()}&nbsp;USD</span>
 									</div>
 
 									<div className="statusLabel">
 										<img
-											src={deposit.withdrawn ? "/images/received.png" : "/images/sent.png"}
+											src={!deposit.sent ? "/images/received.png" : "/images/sent.png"}
 											height="12px"
 											alt="status icon" />
 
-										{deposit.withdrawn ? "received" : "sent"}
+										{!deposit.sent ? "received" : "sent"}
 									</div>
 								</div>
 
@@ -142,11 +170,17 @@ export const MainView = ({ data = null }) => {
 										target="_blank"
 										rel="noreferrer">details</a>
 
-									<button
+									{deposit.sent && <button
 										className="fullwidthButtonWhite"
 										id={deposit.secret}
 										onClick={handleRefund}
-										disabled={new Date(deposit.deadline * 1000) > new Date()}>Refund</button>
+										disabled={new Date(deposit.deadline * 1000) > new Date()}>Refund</button>}
+
+									{!deposit.sent && <button
+										className="fullwidthButtonWhite"
+										id={deposit.secret}
+										data-amount={theDepositAmount.toFixed()}
+										onClick={handleWithdraw}>withdraw</button>}
 								</div>
 							</div>
 						})}
@@ -173,5 +207,11 @@ export const MainView = ({ data = null }) => {
 			text={infoObj.text}
 			type={infoObj.type}
 			onClick={handleCloseMessageModal} />}
+
+		{isShowWithdrawModal && <WithdrawModal
+			account={appController.shortenString(data?.account, 4, 4)}
+			amount={currentWithdrawAmount}
+			txId={txId}
+			onClose={handleCloseWithdrawModal} />}
 	</>
 };

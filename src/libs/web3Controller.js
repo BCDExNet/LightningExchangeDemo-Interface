@@ -76,7 +76,7 @@ export const web3Controller = {
 				gas: 8000000
 			})
 			.on('transactionHash', function (hash) {
-				if (doneCallback) doneCallback();
+				if (doneCallback) doneCallback(hash);
 			}).on('confirmation', function (confirmationNumber, receipt) {
 				// 
 			}).on('receipt', function (receipt) {
