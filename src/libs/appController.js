@@ -56,14 +56,20 @@ export const appController = {
 
 		let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
 		while (i < howManyOrder) {
-			orders.push(await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashByIndex", this._account, i));
+			orders.push({
+				hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashByIndex", this._account, i),
+				sent: true
+			});
 			i++;
 		}
 
 		i = 0;
 		howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashLength", this._account);
 		while (i < howManyOrder) {
-			orders.push(await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i));
+			orders.push({
+				hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i),
+				sent: false
+			});
 			i++;
 		}
 

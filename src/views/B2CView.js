@@ -188,7 +188,7 @@ export const B2CView = ({ data = null }) => {
 			onClose={handleCloseDepositeModal}
 			secret={secretHash}
 			deposited={tokenAmount.toString()}
-			depositor={appController.shortenString(data.account, 4, 4)}
+			depositor={appController.shortenString(data?.account, 4, 4)}
 			beneficiary={appController.shortenString(taker, 4, 4)} />}
 	</>
 };
