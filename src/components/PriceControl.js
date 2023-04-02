@@ -53,7 +53,7 @@ export const PriceControl = ({
 		</div>
 
 		<div className="line">
-			<span>{price}</span>
+			<span>{price.toFixed(2)}</span>
 
 			<button
 				className="tinyButton"
