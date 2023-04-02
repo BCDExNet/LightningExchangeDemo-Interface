@@ -6,7 +6,8 @@ import { Menu } from "../components/Menu";
 
 export const Header = ({
 	account = "",
-	chainId = 1
+	chainId = 1,
+	onConnect = () => { }
 }) => {
 	const networks = Object.values(appConfig.networks);
 
@@ -61,6 +62,17 @@ export const Header = ({
 					{appController.shortenString(account, 5, 3)}
 				</span>
 			</div>}
+
+			{!account && <button
+				className="label"
+				onClick={onConnect}
+				style={{ cursor: "pointer" }}>
+				<img src="/images/mm.png"
+					height="24px"
+					alt="metamask logo" />
+
+				<span>Connect</span>
+			</button>}
 
 			<Menu />
 		</div>

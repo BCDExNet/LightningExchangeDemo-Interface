@@ -44,29 +44,39 @@ function App() {
     turnTimerOn()
   };
 
+  const checkNetwork = async networkSupported => {
+    if (networkSupported) {
+      turnTimerOn();
+      await updateData();
+    } else {
+      if (window.confirm("Unsupported networks, switch to ESC?")) {
+        appController.switchNetwork(0);
+      }
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       turnTimerOff();
 
-      const networkSupported = await appController.init(updateWeb3);
-      if (networkSupported) {
-        turnTimerOn();
-        await updateData();
-      } else {
-        if (window.confirm("Unsupported networks, switch to ESC?")) {
-          appController.switchNetwork(0);
-        }
-      }
+      const networkSupported = await appController.init();
+      checkNetwork(networkSupported);
     };
 
     init();
   }, []);
 
+  const handleConnect = async () => {
+    const networkSupported = await appController.init(updateWeb3);
+    checkNetwork(networkSupported);
+  };
+
   return (
     <div className="App">
       <Header
         account={data?.account}
-        chainId={data?.chainId} />
+        chainId={data?.chainId}
+        onConnect={handleConnect} />
 
       <div className='appView'>
         <BrowserRouter>
