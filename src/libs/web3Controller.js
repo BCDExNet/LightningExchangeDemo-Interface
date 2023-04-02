@@ -47,11 +47,9 @@ export const web3Controller = {
 				params: [{ chainId: cid }],
 			});
 
-			if (indexOfNetwork === 1) {
-				setTimeout(() => {
-					window.location.reload();
-				}, 3000);
-			}
+			setTimeout(() => {
+				window.location.reload();
+			}, 1000);
 		} catch (switchError) {
 			if (switchError.code === 4902) {
 				try {

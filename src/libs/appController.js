@@ -190,6 +190,7 @@ export const appController = {
 	},
 
 	switchNetwork: function (indexOfNetwork) {
+		window.localStorage.setItem(globalUtils.constants.AUTOCONNECT, 1);
 		web3Controller.switchNetwork(indexOfNetwork);
 	},
 

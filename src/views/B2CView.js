@@ -110,8 +110,13 @@ export const B2CView = ({ data = null }) => {
 			expiry,
 			invoice,
 			() => {
-				// window.alert("deposit successfully! secretHash = " + secretHash);
 				setShowDepositeModal(true);
+			},
+			error => {
+				setError({
+					title: globalUtils.constants.SOMETHING_WRONG,
+					text: error.message
+				});
 			}
 		);
 	};

@@ -4,7 +4,8 @@ import "./Select.css";
 export const Select = ({
 	options = [],
 	onChange = () => { },
-	value = 0
+	value = 0,
+	showCheckIcon = true
 }) => {
 	const [indexSelected, setIndexSelected] = useState(value);
 	const [isShowOption, setIsShowOptions] = useState(false);
@@ -38,9 +39,9 @@ export const Select = ({
 					key={index}
 					className="option"
 					onClick={handleSelectOne}>
-					<div
+					{showCheckIcon && <div
 						className="checked"
-						style={{ visibility: index === indexSelected ? "visible" : "hidden" }}>✓</div>
+						style={{ visibility: index === indexSelected ? "visible" : "hidden" }}>✓</div>}
 
 					{option}
 				</div>

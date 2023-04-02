@@ -5,6 +5,7 @@
 	font-weight: 500;
 	font-size: 14px;
 	color: #FFFFFF;
+	z-index: 99;
 }
 
 .selectLayout .select {

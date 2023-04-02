@@ -33,7 +33,7 @@ export const Header = ({
 		</div>
 
 		<div className="menu">
-			<Select
+			{account && <Select
 				onChange={handleSwitchNetwork}
 				value={(networks.findIndex(item => item.chainId === chainId))}
 				options={networks.map((network, index) => {
@@ -51,7 +51,7 @@ export const Header = ({
 							<div className="subTitle">{network.chain}</div>
 						</span>
 					</div>
-				})} />
+				})} />}
 
 			{account && <div className="label">
 				<img src="/images/mm.png"

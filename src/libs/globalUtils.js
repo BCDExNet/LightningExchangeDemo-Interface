@@ -9,7 +9,8 @@ export const globalUtils = {
 		PRICE_DATA_UPDATED: "priceDataUpdated",
 		HEX_PREFIX: "0x",
 		SAT_RATE: 1000,
-		SOMETHING_WRONG: "Something Went Wrong!"
+		SOMETHING_WRONG: "Something Went Wrong!",
+		AUTOCONNECT: "autoconnect"
 	},
 	messageType: {
 		ERROR: 0,
