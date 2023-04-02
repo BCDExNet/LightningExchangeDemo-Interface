@@ -63,7 +63,7 @@ function App() {
       let networkSupported = false;
       if (parseInt(window.localStorage.getItem(globalUtils.constants.AUTOCONNECT)) === 1) {
         networkSupported = await appController.init(updateWeb3);
-        window.localStorage.removeItem(globalUtils.constants.AUTOCONNECT);
+        // window.localStorage.removeItem(globalUtils.constants.AUTOCONNECT);
       } else {
         networkSupported = await appController.init();
       }

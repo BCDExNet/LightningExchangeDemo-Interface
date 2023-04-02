@@ -27,6 +27,7 @@ export const StringInput = ({
 
 	const handleClear = () => {
 		setValue("");
+		onChange("");
 		onClear();
 	};
 

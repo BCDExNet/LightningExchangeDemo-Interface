@@ -13,11 +13,11 @@ export const PriceControl = ({
 	const [price, setPrice] = useState(defaultPrice);
 
 	useEffect(() => {
-		originPrice = defaultPrice;
-	}, []);
-
-	useEffect(() => {
 		setPrice(defaultPrice);
+
+		if (originPrice === 0) {
+			originPrice = defaultPrice;
+		}
 	}, [defaultPrice]);
 
 	const updatePrice = newPrice => {

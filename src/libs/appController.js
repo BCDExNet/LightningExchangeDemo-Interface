@@ -28,6 +28,8 @@ export const appController = {
 		let success = false;
 
 		if (updateWeb3Func) {
+			window.localStorage.setItem(globalUtils.constants.AUTOCONNECT, 1);
+
 			success = await web3Controller.connect(eventObject => {
 				this._getWeb3Context();
 				updateWeb3Func(eventObject);
