@@ -173,7 +173,8 @@ export const B2CView = ({ data = null }) => {
 
 			{data?.tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
 				className="fullwidthButton"
-				onClick={handleApprove}>Approve</button> : <button
+				onClick={handleApprove}
+				disabled={!data?.account}>Approve</button> : <button
 					className="fullwidthButton"
 					onClick={handleDeposit}
 					disabled={tokenAmount.eq(0) || !taker || !invoice || data?.tokens[tokenToSellSelected].deficit}>Deposit</button>}

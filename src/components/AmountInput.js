@@ -52,8 +52,6 @@ export const AmountInput = ({
 		onChange(balance);
 	};
 
-	console.debug("theToken?.symbol =", theToken?.symbol);
-
 	return <div className="amountInputLayout">
 		<div className="amountInputTitleBar">
 			<div className="title">

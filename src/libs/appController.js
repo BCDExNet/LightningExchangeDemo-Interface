@@ -25,10 +25,16 @@ export const appController = {
 	_data: null,
 
 	init: async function (updateWeb3Func) {
-		const success = await web3Controller.connect(eventObject => {
-			this._getWeb3Context();
-			updateWeb3Func(eventObject);
-		});
+		let success = false;
+
+		if (updateWeb3Func) {
+			success = await web3Controller.connect(eventObject => {
+				this._getWeb3Context();
+				updateWeb3Func(eventObject);
+			});
+		} else {
+			success = web3Controller.connectDefaultNetwork();
+		}
 
 		if (success) {
 			return this._getWeb3Context();
@@ -36,6 +42,13 @@ export const appController = {
 	},
 
 	getDataWithToken: async function (token) {
+		if (!this._account) {
+			return {
+				allowance: globalUtils.constants.BIGNUMBER_ZERO,
+				balance: globalUtils.constants.BIGNUMBER_ZERO
+			};
+		}
+
 		const tokenConfig = this._config.tokens[token];
 		const erc20Abi = await this._loadJson(tokenConfig.abi);
 		const allowance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "allowance", this._account, this._config.safeBox.address);
@@ -54,23 +67,25 @@ export const appController = {
 		const orders = [];
 		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
 
-		let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
-		while (i < howManyOrder) {
-			orders.push({
-				hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashByIndex", this._account, i),
-				sent: true
-			});
-			i++;
-		}
+		if (this._account) {
+			let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
+			while (i < howManyOrder) {
+				orders.push({
+					hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashByIndex", this._account, i),
+					sent: true
+				});
+				i++;
+			}
 
-		i = 0;
-		howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashLength", this._account);
-		while (i < howManyOrder) {
-			orders.push({
-				hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i),
-				sent: false
-			});
-			i++;
+			i = 0;
+			howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashLength", this._account);
+			while (i < howManyOrder) {
+				orders.push({
+					hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i),
+					sent: false
+				});
+				i++;
+			}
 		}
 
 		const tokenSymbols = Object.keys(this._config.tokens);

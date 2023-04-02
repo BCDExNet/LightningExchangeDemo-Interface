@@ -10,6 +10,13 @@ export const web3Controller = {
 	account: "",
 	chainId: 0,
 
+	connectDefaultNetwork: function () {
+		const theDefaultNetwork = appConfig.networks[appConfig.defaultNetwork];
+		this._web3 = new Web3(theDefaultNetwork.rpcUrls[0]);
+		this.chainId = theDefaultNetwork.chainId;
+		return true;
+	},
+
 	connect: async function (updateWeb3Func) {
 		this._updateWeb3Func = updateWeb3Func;
 
