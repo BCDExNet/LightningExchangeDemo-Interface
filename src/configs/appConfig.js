@@ -3,25 +3,8 @@ export const appConfig = {
 	btcLimit: 50000,
 	updateDurationMS: 600000,
 	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin",
-	defaultNetwork: "elastos",
+	defaultNetwork: "bsc",
 	networks: {
-		elastos: {
-			chainName: "Elastos",
-			chain: "ESC",
-			chainId: 20,
-			rpcUrls: [
-				"https://api.elastos.io/esc"
-			],
-			nativeCurrency: {
-				name: "ELA",
-				symbol: "ELA",
-				decimals: 18
-			},
-			blockExplorerUrls: [
-				"https://eth.elastos.io/"
-			],
-			iconUrls: ["/images/esc.svg"]
-		},
 		bsc: {
 			chainName: "Binance",
 			chain: "BSC",
@@ -38,6 +21,23 @@ export const appConfig = {
 				"https://bscscan.com/"
 			],
 			iconUrls: ["/images/bsc.svg"]
+		},
+		elastos: {
+			chainName: "Elastos",
+			chain: "ESC",
+			chainId: 20,
+			rpcUrls: [
+				"https://api.elastos.io/esc"
+			],
+			nativeCurrency: {
+				name: "ELA",
+				symbol: "ELA",
+				decimals: 18
+			},
+			blockExplorerUrls: [
+				"https://eth.elastos.io/"
+			],
+			iconUrls: ["/images/esc.svg"]
 		},
 		arbitrum: {
 			chainName: "Arbitrum",
