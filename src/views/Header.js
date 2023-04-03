@@ -21,15 +21,6 @@ export const Header = ({
 				src="/images/logo.png"
 				height="26px"
 				alt="logo" />
-
-			{/* <a href="/">Lightning Network Exchange Demo</a>
-
-			<a
-				href="https://docs.bcdex.net"
-				target="_blank"
-				rel="noreferrer">Doc</a>
-
-			<a>How It Work</a> */}
 		</div>
 
 		<div className="menu">
