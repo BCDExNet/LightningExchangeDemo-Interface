@@ -50,9 +50,7 @@ function App() {
       turnTimerOn();
       await updateData();
     } else {
-      if (window.confirm("Unsupported networks, switch to ESC?")) {
-        appController.switchNetwork(0);
-      }
+      window.alert("Unsupported network, this Demo supports running on BSC and Arbitrum network.");
     }
   };
 
