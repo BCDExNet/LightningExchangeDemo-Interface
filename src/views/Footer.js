@@ -35,12 +35,12 @@ export const Footer = () => {
 				<LinkWithIcon
 					icon="/images/twitter.png"
 					label="twitter"
-					url="https://twitter.com" />
+					url="https://twitter.com/bcde2009" />
 
 				<LinkWithIcon
 					icon="/images/github.png"
 					label="github"
-					url="https://github.com" />
+					url="https://github.com/BCDExNet" />
 			</div>
 		</div>
 
