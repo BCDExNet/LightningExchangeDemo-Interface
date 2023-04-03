@@ -9,6 +9,8 @@ import { appController } from "../libs/appController";
 import { globalUtils } from "../libs/globalUtils";
 import { invoiceDecoder } from "../libs/invoiceDecoder";
 import "./MainView.css";
+import { DepositModal } from "./DepositModal";
+import { MessageModal } from "./MessageModal";
 
 export const C2CView = ({ data = null }) => {
 	const [tokenAmount, setTokenAmount] = useState(globalUtils.constants.BIGNUMBER_ZERO);
@@ -20,6 +22,8 @@ export const C2CView = ({ data = null }) => {
 	const [invoice, setInvoice] = useState("");
 	const [price, setPrice] = useState(0);
 	const [tokenToSellSelected, setTokenToSellSelected] = useState(0);
+	const [showDepositModal, setShowDepositModal] = useState(false);
+	const [error, setError] = useState(null);
 	const tokens = data?.tokens;
 
 	useEffect(() => {
@@ -97,9 +101,23 @@ export const C2CView = ({ data = null }) => {
 			expiry,
 			invoice,
 			() => {
-				window.alert("deposit successfully! secretHash = " + secretHash);
+				setShowDepositModal(true);
+			},
+			err => {
+				setError({
+					title: globalUtils.constants.SOMETHING_WRONG,
+					text: err.message
+				});
 			}
 		);
+	};
+
+	const handleCloseDepositModal = () => {
+		setShowDepositModal(false);
+	};
+
+	const handleCloseError = () => {
+		setError(null);
 	};
 
 	const handleApprove = () => {
@@ -107,13 +125,9 @@ export const C2CView = ({ data = null }) => {
 			tokens[tokenToSellSelected].symbol,
 			() => {
 				setTimeout(() => {
-					// recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
-
-					setTimeout(() => {
-						if (tokenAmount.gt(0) && taker && invoice && !tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
-							handleDeposit();
-						}
-					}, 1000);
+					if (tokenAmount.gt(0) && taker && invoice && !tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
+						handleDeposit();
+					}
 				}, 6000);
 			}
 		);
@@ -208,9 +222,22 @@ export const C2CView = ({ data = null }) => {
 
 		{tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
-			onClick={handleApprove}>Approve</button> : <button
+			onClick={handleApprove}
+			disabled={!data?.account}>Approve</button> : <button
 				className="fullwidthButton"
 				onClick={handleDeposit}
 				disabled={tokenAmount.eq(0) || !taker || !invoice || tokens[tokenToSellSelected].deficit}>Deposit</button>}
+
+		{showDepositModal && <DepositModal
+			onClose={handleCloseDepositModal}
+			secret={secretHash}
+			deposited={tokenAmount.integerValue().toString()}
+			depositor={appController.shortenString(data?.account, 4, 4)}
+			beneficiary={appController.shortenString(taker, 4, 4)} />}
+
+		{error && <MessageModal
+			title={error.title}
+			text={error.text}
+			onClick={handleCloseError} />}
 	</div>
 };

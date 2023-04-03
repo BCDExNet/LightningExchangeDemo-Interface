@@ -167,8 +167,6 @@ export const appController = {
 	},
 
 	refund: async function (secret, doneCallback, cancelCallback) {
-		console.debug("refund()", secret);
-
 		const abi = await this._loadJson(this._config.safeBox.abi);
 		web3Controller.sendContract(
 			this._config.safeBox.address,

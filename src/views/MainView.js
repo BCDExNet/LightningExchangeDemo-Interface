@@ -41,6 +41,7 @@ export const MainView = ({ data = null }) => {
 				const id = theDeposit.hash;
 				const result = await appController.getDepositInfo(id);
 				result.secret = id;
+				result.id = id + String(i);
 				result.sent = theDeposit.sent;
 				tempArray.push(result);
 			}
@@ -60,8 +61,8 @@ export const MainView = ({ data = null }) => {
 			() => {
 				setInfoObj({
 					type: globalUtils.messageType.DONE,
-					title: "refund Successful!",
-					text: "refund Successful!"
+					title: "Refund Successful!",
+					text: "Refund Successful!"
 				});
 			},
 			err => {
@@ -87,7 +88,7 @@ export const MainView = ({ data = null }) => {
 				setInfoObj({
 					type: globalUtils.messageType.ERROR,
 					title: globalUtils.constants.SOMETHING_WRONG,
-					text: err.message
+					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
 			}
 		);
@@ -130,7 +131,7 @@ export const MainView = ({ data = null }) => {
 							const theDepositAmount = BigNumber(deposit.amount).shiftedBy(-theToken.decimals);
 
 							return <div
-								key={deposit.secret}
+								key={deposit.id}
 								className="orderItem">
 								<div className="headerLine">
 									<div className="keyAndValue">
@@ -211,7 +212,7 @@ export const MainView = ({ data = null }) => {
 		{isShowWithdrawModal && <WithdrawModal
 			account={appController.shortenString(data?.account, 4, 4)}
 			amount={currentWithdrawAmount}
-			txId={txId}
+			txId={appController.shortenString(txId, 4, 4)}
 			onClose={handleCloseWithdrawModal} />}
 	</>
 };

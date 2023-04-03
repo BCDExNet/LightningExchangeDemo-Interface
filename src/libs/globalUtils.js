@@ -10,7 +10,8 @@ export const globalUtils = {
 		HEX_PREFIX: "0x",
 		SAT_RATE: 1000,
 		SOMETHING_WRONG: "Something Went Wrong!",
-		AUTOCONNECT: "autoconnect"
+		AUTOCONNECT: "autoconnect",
+		REVERTED_MESSAGE: "Transaction has been reverted by the EVM"
 	},
 	messageType: {
 		ERROR: 0,
