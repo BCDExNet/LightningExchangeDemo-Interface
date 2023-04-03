@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { KeyAndValueInLine } from "../components/KeyAndValueInLine";
 import { Modal } from "../components/Modal";
 import { SecretHashLabel } from "../components/SecretHashLabel";
 import "./DepositModal.css";
+import ClipboardJS from "clipboard";
 
 export const DepositModal = ({
 	onClose = () => { },
@@ -10,6 +12,26 @@ export const DepositModal = ({
 	depositor = "",
 	beneficiary = ""
 }) => {
+	useEffect(() => {
+		const cp = new ClipboardJS("#copyHashButton", {
+			text: () => {
+				return window.location.origin + "/deposit/" + secret
+			}
+		});
+
+		// cp.on('success', function (e) {
+		// 	// 
+		// });
+
+		// cp.on('error', function (e) {
+		// 	console.error(e);
+		// });
+
+		return () => {
+			cp.destroy();
+		};
+	}, []);
+
 	return <Modal>
 		<div className="depositModalLayout">
 			<img
@@ -38,18 +60,16 @@ export const DepositModal = ({
 
 				<div>Send the link to your exchange partner so that he can complete the transaction</div>
 
-				{/* <button className="smallButton">
+				<button
+					id="copyHashButton"
+					className="smallButton">
 					<img
 						src="/images/copy_black.png"
 						height="16px"
 						alt="copy" />
 
 					<span>copy link</span>
-				</button> */}
-				<a
-					href={"/deposit/" + secret}
-					target="_blank"
-					rel="noreferrer">details</a>
+				</button>
 			</div>
 
 			<button
