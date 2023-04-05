@@ -71,8 +71,8 @@ export const C2CView = ({ data = null }) => {
 			if (decoded.amount > 0) {
 				const sats = decoded.amount / 1000;
 
-				// recomputeAmountToSell(tokenToSellSelected, sats + appConfig.fee);
-				setTokenAmount(appController.computeTokenWithBTC(sats + appConfig.fee, tokens[tokenToSellSelected].symbol));
+				// recomputeAmountToSell(tokenToSellSelected, sats);
+				setTokenAmount(appController.computeTokenWithBTC(sats, tokens[tokenToSellSelected].symbol));
 				setBTCAmount(sats);
 				setSatFromInvoice(sats);
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
@@ -150,7 +150,7 @@ export const C2CView = ({ data = null }) => {
 	};
 
 	useEffect(() => {
-		recomputeAmountToSell(tokenToSellSelected, BigNumber(btcAmount).plus(appConfig.fee));
+		recomputeAmountToSell(tokenToSellSelected, BigNumber(btcAmount));
 	}, [tokenToSellSelected, btcAmount, price]);
 
 	const handleSelectToken = async idx => {
