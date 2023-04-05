@@ -46,16 +46,12 @@ function App() {
   };
 
   const checkNetwork = async networkSupported => {
-    turnTimerOn();
-    await updateData();
-    // if (networkSupported) {
-    //   turnTimerOn();
-    //   await updateData();
-    // } else {
-    //   if (window.confirm("Unsupported networks, switch to ESC?")) {
-    //     appController.switchNetwork(0);
-    //   }
-    // }
+    if (networkSupported) {
+      turnTimerOn();
+      await updateData();
+    } else {
+      window.alert("Unsupported network, this Demo supports running on BSC and Arbitrum network.");
+    }
   };
 
   useEffect(() => {
