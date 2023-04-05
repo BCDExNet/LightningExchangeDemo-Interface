@@ -1,4 +1,5 @@
 export const appConfig = {
+	fraction: 6,
 	fee: 100,
 	btcLimit: 50000,
 	updateDurationMS: 600000,

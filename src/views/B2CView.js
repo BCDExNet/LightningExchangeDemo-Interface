@@ -20,6 +20,7 @@ export const B2CView = ({ data = null }) => {
 	const [error, setError] = useState(null);
 	const [showDepositeModal, setShowDepositeModal] = useState(false);
 	const tokens = data?.tokens ?? [];
+	const theToken = tokens[tokenToSellSelected];
 
 	const updateTokenData = async index => {
 		const theToken = tokens[index];
@@ -95,13 +96,13 @@ export const B2CView = ({ data = null }) => {
 
 	const handleApprove = () => {
 		appController.approve(
-			tokens[tokenToSellSelected]?.symbol,
+			theToken?.symbol,
 			() => {
 				setTimeout(() => {
 					recomputeAmountToSell(tokenToSellSelected, btcAmount + appConfig.fee);
 
 					setTimeout(() => {
-						if (tokenAmount.gt(0) && taker && invoice && !tokens[tokenToSellSelected]?.deficit && secretHash && expiry > 0) {
+						if (tokenAmount.gt(0) && taker && invoice && !theToken?.deficit && secretHash && expiry > 0) {
 							handleDeposit();
 						}
 					}, 1000);
@@ -112,7 +113,7 @@ export const B2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			tokens[tokenToSellSelected]?.symbol,
+			theToken?.symbol,
 			tokenAmount.toString(),
 			taker,
 			secretHash,
@@ -185,13 +186,13 @@ export const B2CView = ({ data = null }) => {
 				tokens={tokens}
 				onTokenSelected={handleSelectToken} />
 
-			{tokens[tokenToSellSelected]?.allowance?.lt(tokenAmount) ? <button
+			{theToken?.allowance?.lt(tokenAmount) ? <button
 				className="fullwidthButton"
 				onClick={handleApprove}
 				disabled={!data?.account}>Approve</button> : <button
 					className="fullwidthButton"
 					onClick={handleDeposit}
-					disabled={tokenAmount.eq(0) || !taker || !invoice || tokens[tokenToSellSelected]?.deficit}>Deposit</button>}
+					disabled={tokenAmount.eq(0) || !taker || !invoice || theToken?.deficit}>Deposit</button>}
 		</div>
 
 		{error && <MessageModal
@@ -202,7 +203,7 @@ export const B2CView = ({ data = null }) => {
 		{showDepositeModal && <DepositModal
 			onClose={handleCloseDepositeModal}
 			secret={secretHash}
-			deposited={tokenAmount.toString()}
+			deposited={tokenAmount.shiftedBy(-theToken.decimals).toFixed(appConfig.fraction)}
 			depositor={appController.shortenString(data?.account, 4, 4)}
 			beneficiary={appController.shortenString(taker, 4, 4)} />}
 	</>
