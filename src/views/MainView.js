@@ -85,6 +85,8 @@ export const MainView = ({ data = null }) => {
 				setIsShowWithdrawModal(true);
 			},
 			err => {
+				handleCloseWithdrawModal();
+
 				setInfoObj({
 					type: globalUtils.messageType.ERROR,
 					title: globalUtils.constants.SOMETHING_WRONG,

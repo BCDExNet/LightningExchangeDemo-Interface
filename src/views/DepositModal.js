@@ -32,7 +32,7 @@ export const DepositModal = ({
 		};
 	}, []);
 
-	return <Modal>
+	return <Modal onClose={onClose}>
 		<div className="depositModalLayout">
 			<img
 				src="/images/deposit.png"

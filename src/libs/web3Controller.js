@@ -74,21 +74,39 @@ export const web3Controller = {
 		return await this._makeContract(address, abi).methods[method](...args).call();
 	},
 
-	sendContract: function (address, abi, method, doneCallback, cancelCallback, ...args) {
-		this._makeContract(address, abi).methods[method](...args)
-			.send({
-				from: this.account,
-				gas: 8000000
-			})
-			.on('transactionHash', function (hash) {
-				if (doneCallback) doneCallback(hash);
-			}).on('confirmation', function (confirmationNumber, receipt) {
-				// 
-			}).on('receipt', function (receipt) {
-				// 
-			}).on('error', function (error, receipt) {
-				if (cancelCallback) cancelCallback(error);
-			});
+	sendContract: async function (address, abi, method, doneCallback, cancelCallback, ...args) {
+		const func = this._makeContract(address, abi).methods[method](...args);
+
+		let gas = 0;
+		try {
+			gas = await func.estimateGas({ from: this.account });
+		} catch (error) {
+			console.error(error);
+
+			try {
+				const block = await this._web3.eth.getBlock();
+				gas = block.gasLimit;
+			} catch (blockError) {
+				console.error(blockError);
+
+				if (cancelCallback) {
+					return cancelCallback({ message: "gas required exceeds allowance" });
+				}
+			}
+		}
+
+		func.send({
+			from: this.account,
+			gas
+		}).on('transactionHash', function (hash) {
+			if (doneCallback) doneCallback(hash);
+		}).on('confirmation', function (confirmationNumber, receipt) {
+			// 
+		}).on('receipt', function (receipt) {
+			// 
+		}).on('error', function (error, receipt) {
+			if (cancelCallback) cancelCallback(error);
+		});
 	},
 
 	_makeContract: function (address, abi = null) {
