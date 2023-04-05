@@ -195,7 +195,7 @@ export const appController = {
 	},
 
 	shortenString: function (str, head, tail) {
-		return str.substring(0, head) + "..." + str.substring(str.length - tail);
+		return str ? str.substring(0, head) + "..." + str.substring(str.length - tail) : "";
 	},
 
 	btc2sat: function (btc) {

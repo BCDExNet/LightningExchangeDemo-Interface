@@ -46,14 +46,16 @@ function App() {
   };
 
   const checkNetwork = async networkSupported => {
-    if (networkSupported) {
-      turnTimerOn();
-      await updateData();
-    } else {
-      if (window.confirm("Unsupported networks, switch to ESC?")) {
-        appController.switchNetwork(0);
-      }
-    }
+    turnTimerOn();
+    await updateData();
+    // if (networkSupported) {
+    //   turnTimerOn();
+    //   await updateData();
+    // } else {
+    //   if (window.confirm("Unsupported networks, switch to ESC?")) {
+    //     appController.switchNetwork(0);
+    //   }
+    // }
   };
 
   useEffect(() => {
