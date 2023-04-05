@@ -122,10 +122,12 @@ export const B2CView = ({ data = null }) => {
 			() => {
 				setShowDepositeModal(true);
 			},
-			error => {
+			err => {
+				setShowDepositeModal(false);
+				
 				setError({
 					title: globalUtils.constants.SOMETHING_WRONG,
-					text: error.message
+					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
 			}
 		);

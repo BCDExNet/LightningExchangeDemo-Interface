@@ -25,6 +25,7 @@ export const C2CView = ({ data = null }) => {
 	const [showDepositModal, setShowDepositModal] = useState(false);
 	const [error, setError] = useState(null);
 	const tokens = data?.tokens;
+	const theToken = tokens[tokenToSellSelected];
 
 	useEffect(() => {
 		if (data) {
@@ -41,18 +42,17 @@ export const C2CView = ({ data = null }) => {
 	}, []);
 
 	const handleChange = val => {
-		const theToken = tokens[tokenToSellSelected];
 		setTokenAmount(BigNumber(val).shiftedBy(theToken.decimals));
 		setBTCAmount(appController.computeBTCWithToken(theToken.symbol, val, price));
 		// recomputeAmountToSell(tokenToSellSelected, btcAmount);
 	};
 
-	const handleChangeBTC = val => {
-		const sat = appController.btc2sat(val);
-		setBTCAmount(sat);
-		setTokenAmount(appController.computeTokenWithBTC(sat, tokens[tokenToSellSelected].symbol, price));
-		// recomputeAmountToSell(tokenToSellSelected, sat);
-	}
+	// const handleChangeBTC = val => {
+	// 	const sat = appController.btc2sat(val);
+	// 	setBTCAmount(sat);
+	// 	setTokenAmount(appController.computeTokenWithBTC(sat, tokens[tokenToSellSelected].symbol, price));
+	// 	// recomputeAmountToSell(tokenToSellSelected, sat);
+	// }
 
 	const handleChangeTaker = val => {
 		setTaker(val);
@@ -104,9 +104,11 @@ export const C2CView = ({ data = null }) => {
 				setShowDepositModal(true);
 			},
 			err => {
+				setShowDepositModal(false);
+
 				setError({
 					title: globalUtils.constants.SOMETHING_WRONG,
-					text: err.message
+					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
 			}
 		);
@@ -200,7 +202,7 @@ export const C2CView = ({ data = null }) => {
 			defaultPrice={price}
 			onChange={handleUpdatePrice} />
 
-		<AmountInput
+		{/* <AmountInput
 			title="You Buy"
 			tokens={[{
 				symbol: "btc",
@@ -212,7 +214,7 @@ export const C2CView = ({ data = null }) => {
 			valueForced={BigNumber(btcAmount)?.shiftedBy(-8).toFixed()}
 			onChange={handleChangeBTC}
 			showMax={false}
-			min={0} />
+			min={0} /> */}
 
 		<StringInput
 			title="Exchange Partner Address"
@@ -231,7 +233,7 @@ export const C2CView = ({ data = null }) => {
 		{showDepositModal && <DepositModal
 			onClose={handleCloseDepositModal}
 			secret={secretHash}
-			deposited={tokenAmount.integerValue().toString()}
+			deposited={tokenAmount.shiftedBy(-tokens[tokenToSellSelected].decimals).toFixed(appConfig.fraction)}
 			depositor={appController.shortenString(data?.account, 4, 4)}
 			beneficiary={appController.shortenString(taker, 4, 4)} />}
 
