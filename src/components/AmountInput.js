@@ -13,7 +13,7 @@ export const AmountInput = ({
 	// balance = 0,
 	showMax = true,
 	onChange = () => { },
-	min = 1,
+	min = 0,
 	valueForced = 0,
 }) => {
 	const [tokenSelected, setTokenSelected] = useState(0);

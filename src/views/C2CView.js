@@ -147,6 +147,7 @@ export const C2CView = ({ data = null }) => {
 		const howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol, price);
 		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
 		theToken.deficit = howMuchToken.gt(theToken.balance);
+		setTokenAmount(howMuchToken);
 	};
 
 	useEffect(() => {
@@ -194,7 +195,7 @@ export const C2CView = ({ data = null }) => {
 			tokens={tokens}
 			onTokenSelected={handleSelectToken}
 			onChange={handleChange}
-			valueForced={tokenAmount.shiftedBy(-tokens[tokenToSellSelected].decimals).toNumber()} />
+			valueForced={tokenAmount.shiftedBy(-theToken.decimals).toNumber()} />
 
 		<PriceControl
 			title="Exchange Rate"

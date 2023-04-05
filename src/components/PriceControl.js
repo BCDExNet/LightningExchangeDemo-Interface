@@ -27,6 +27,7 @@ export const PriceControl = ({
 
 	const handleResetPrice = () => {
 		setPrice(originPrice);
+		onChange(originPrice);
 	};
 
 	const handleReduce = () => {
