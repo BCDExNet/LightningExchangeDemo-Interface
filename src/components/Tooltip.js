@@ -13,7 +13,7 @@ export const Tooltip = ({
 	sup = false,
 	content = ""
 }) => {
-	let timer = null;
+	// let timer = null;
 	const [isShowContent, setIsShowContent] = useState(false);
 	const [contentWidth, setContentWidth] = useState(0);
 	const [contentHeight, setContentHeight] = useState(0);
@@ -26,23 +26,24 @@ export const Tooltip = ({
 		}
 	}, [isShowContent]);
 
-	const clearTimer = () => {
-		if (timer) {
-			clearTimeout(timer);
-			timer = null;
-		}
-	};
+	// const clearTimer = () => {
+	// 	if (timer) {
+	// 		clearTimeout(timer);
+	// 		timer = null;
+	// 	}
+	// };
 
 	const handleMouseOver = () => {
 		setIsShowContent(true);
-		clearTimer();
+		// clearTimer();
 	}
 
 	const handleMouseOut = () => {
-		clearTimer();
-		timer = setTimeout(() => {
-			setIsShowContent(false);
-		}, 3000);
+		// clearTimer();
+		// timer = setTimeout(() => {
+		// 	setIsShowContent(false);
+		// }, 3000);
+		setIsShowContent(false);
 	}
 
 	return <>
