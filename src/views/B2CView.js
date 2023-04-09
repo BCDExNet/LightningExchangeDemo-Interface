@@ -114,7 +114,7 @@ export const B2CView = ({ data = null }) => {
 	const handleDeposit = () => {
 		appController.deposit(
 			theToken?.symbol,
-			tokenAmount.toString(),
+			tokenAmount.toFixed(),
 			taker,
 			secretHash,
 			expiry,
@@ -137,7 +137,7 @@ export const B2CView = ({ data = null }) => {
 	const handleSelectToken = async idx => {
 		await updateTokenData(idx);
 		setTokenToSellSelected(idx);
-		recomputeAmountToSell(idx, btcAmount);
+		recomputeAmountToSell(idx, btcAmount + appConfig.fee);
 	};
 
 	const handleCloseError = () => {
