@@ -3,7 +3,7 @@ export const appConfig = {
 	fee: 100,
 	btcLimit: 50000,
 	updateDurationMS: 600000,
-	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin,elastos,ethereum,kingcorgi-chain,rei-network,iotex",
+	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin,elastos,ethereum,kucoin-shares,rei-network,iotex",
 	defaultNetwork: "bsc",
 	networks: {
 		bsc: {
@@ -196,9 +196,9 @@ export const appConfig = {
 		"321": {
 			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 			tokens: {
-				kcc: {
+				kcs: {
 					isNative: true,
-					name: "KCC",
+					name: "KCS",
 					decimals: 18,
 					logo: "/images/kcs.png"
 				}
