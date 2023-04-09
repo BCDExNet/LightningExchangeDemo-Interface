@@ -66,6 +66,10 @@ export const B2CView = ({ data = null }) => {
 	};
 
 	const handleChangeInvoice = val => {
+		if (!val || val.length === 0) {
+			return init();
+		}
+
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0 && decoded.amount < appConfig.btcLimit * globalUtils.constants.SAT_RATE) {

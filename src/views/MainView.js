@@ -193,7 +193,7 @@ export const MainView = ({ data = null }) => {
 									{deposit.sent && <button
 										className="fullwidthButtonWhite"
 										id={deposit.secret}
-										data-native={Number(theToken.isNative)}
+										data-native={Number(Boolean(theToken.isNative))}
 										onClick={handleRefund}
 										disabled={new Date(deposit.deadline * 1000) > new Date()}>Refund</button>}
 
@@ -201,7 +201,7 @@ export const MainView = ({ data = null }) => {
 										className="fullwidthButtonWhite"
 										id={deposit.secret}
 										data-amount={theDepositAmount.toFixed()}
-										data-native={Number(theToken.isNative)}
+										data-native={Number(Boolean(theToken.isNative))}
 										onClick={handleWithdraw}>withdraw</button>}
 								</div>
 							</div>

@@ -31,9 +31,15 @@ export const StringInput = ({
 		onClear();
 	};
 
-	const handlePaste = () => {
+	const handlePaste = event => {
+		event.stopPropagation();
+
 		window.navigator?.clipboard?.readText && navigator?.clipboard?.readText().then(clipText => {
 			setValue(clipText);
+
+			setTimeout(() => {
+				onChange(clipText);
+			}, 1000);
 		})
 	};
 

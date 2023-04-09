@@ -60,12 +60,18 @@ export const C2CView = ({ data = null }) => {
 
 	const reset = () => {
 		setBTCAmount(0);
+		setSatFromInvoice(0);
 		setTokenAmount(globalUtils.constants.BIGNUMBER_ZERO)
 		setExpiry(0);
 		setSecretHash("");
+		// recomputeAmountToSell(tokenToSellSelected, 0);
 	};
 
 	const handleChangeInvoice = val => {
+		if (!val || val.length === 0) {
+			return reset();
+		}
+
 		try {
 			const decoded = invoiceDecoder.decode(val);
 			if (decoded.amount > 0) {
