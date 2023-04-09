@@ -24,7 +24,7 @@ export const B2CView = ({ data = null }) => {
 
 	const updateTokenData = async index => {
 		const theToken = tokens[index];
-		const result = await appController.getDataWithToken(theToken.symbol);
+		const result = await appController.getDataWithToken(theToken.symbol, theToken.isNative);
 		theToken.allowance = result.allowance;
 		theToken.balance = result.balance;
 	};
@@ -124,12 +124,13 @@ export const B2CView = ({ data = null }) => {
 			},
 			err => {
 				setShowDepositeModal(false);
-				
+
 				setError({
 					title: globalUtils.constants.SOMETHING_WRONG,
 					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
-			}
+			},
+			theToken.isNative
 		);
 	};
 
@@ -207,6 +208,7 @@ export const B2CView = ({ data = null }) => {
 			secret={secretHash}
 			deposited={tokenAmount.shiftedBy(-theToken.decimals).toFixed(appConfig.fraction)}
 			depositor={appController.shortenString(data?.account, 4, 4)}
-			beneficiary={appController.shortenString(taker, 4, 4)} />}
+			beneficiary={appController.shortenString(taker, 4, 4)}
+			native={theToken.isNative} />}
 	</>
 };

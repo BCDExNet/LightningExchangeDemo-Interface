@@ -11,7 +11,8 @@ export const globalUtils = {
 		SAT_RATE: 1000,
 		SOMETHING_WRONG: "Something Went Wrong!",
 		AUTOCONNECT: "autoconnect",
-		REVERTED_MESSAGE: "Transaction has been reverted by the EVM"
+		REVERTED_MESSAGE: "Transaction has been reverted by the EVM",
+		MAX_BIGNUMBER_STRING: BigNumber(2).pow(256).minus(1).toFixed()
 	},
 	messageType: {
 		ERROR: 0,

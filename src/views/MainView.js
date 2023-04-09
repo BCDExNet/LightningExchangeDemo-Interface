@@ -39,10 +39,11 @@ export const MainView = ({ data = null }) => {
 			for (let i = 0; i < data.orders.length; i++) {
 				const theDeposit = data.orders[i];
 				const id = theDeposit.hash;
-				const result = await appController.getDepositInfo(id);
+				const result = await appController.getDepositInfo(id, theDeposit.native);
 				result.secret = id;
 				result.id = id + String(i);
 				result.sent = theDeposit.sent;
+				result.native = theDeposit.native;
 				tempArray.push(result);
 			}
 			setDeposits(tempArray);
@@ -71,7 +72,8 @@ export const MainView = ({ data = null }) => {
 					title: globalUtils.constants.SOMETHING_WRONG,
 					text: err.message
 				});
-			}
+			},
+			Boolean(parseInt(event.currentTarget.dataset.native))
 		);
 	};
 
@@ -92,7 +94,8 @@ export const MainView = ({ data = null }) => {
 					title: globalUtils.constants.SOMETHING_WRONG,
 					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
-			}
+			},
+			Boolean(parseInt(event.currentTarget.dataset.native))
 		);
 	};
 
@@ -129,7 +132,13 @@ export const MainView = ({ data = null }) => {
 
 					<div className="scrollBox">
 						{deposits.map(deposit => {
-							const theToken = Object.values(appConfig.exchanges[data?.chainId].tokens).find(item => item.address.toLocaleLowerCase() === deposit.token.toLocaleLowerCase());
+							const theToken = Object.values(appConfig.exchanges[data?.chainId].tokens).find(item => {
+								if (deposit.token) {
+									return item.address?.toLocaleLowerCase() === deposit.token?.toLocaleLowerCase();
+								} else {
+									return item.isNative;
+								}
+							});
 							const theDepositAmount = BigNumber(deposit.amount).shiftedBy(-theToken.decimals);
 
 							return <div
@@ -142,18 +151,26 @@ export const MainView = ({ data = null }) => {
 											height="24px"
 											alt="token logo" />}
 
-										<span>{theDepositAmount.toFixed()}&nbsp;{theToken.symbol}</span>
+										<span>{theDepositAmount.toFixed(appConfig.fraction)}&nbsp;{theToken.symbol}</span>
 
-										<span className="subValue">~{theDepositAmount.multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed()}&nbsp;USD</span>
+										<span className="subValue">~{theDepositAmount.multipliedBy(appController.getTokenPrice(theToken.symbol)).toFixed(appConfig.fraction)}&nbsp;USD</span>
 									</div>
 
-									<div className="statusLabel">
-										<img
-											src={!deposit.sent ? "/images/received.png" : "/images/sent.png"}
-											height="12px"
-											alt="status icon" />
+									<div style={{
+										display: "flex",
+										flexDirection: "row",
+										gap: "0.5em"
+									}}>
+										<div className="statusLabel">
+											<img
+												src={!deposit.sent ? "/images/received.png" : "/images/sent.png"}
+												height="12px"
+												alt="status icon" />
 
-										{!deposit.sent ? "received" : "sent"}
+											{!deposit.sent ? "received" : "sent"}
+										</div>
+
+										{deposit.native && <div className="statusLabel">native</div>}
 									</div>
 								</div>
 
@@ -169,13 +186,14 @@ export const MainView = ({ data = null }) => {
 									<a
 										className="fullwidthButton"
 										style={{ textAlign: "center" }}
-										href={"/deposit/" + deposit.secret}
+										href={"/deposit/" + deposit.secret + "?native=" + Number(Boolean(theToken.isNative))}
 										target="_blank"
 										rel="noreferrer">details</a>
 
 									{deposit.sent && <button
 										className="fullwidthButtonWhite"
 										id={deposit.secret}
+										data-native={Number(theToken.isNative)}
 										onClick={handleRefund}
 										disabled={new Date(deposit.deadline * 1000) > new Date()}>Refund</button>}
 
@@ -183,6 +201,7 @@ export const MainView = ({ data = null }) => {
 										className="fullwidthButtonWhite"
 										id={deposit.secret}
 										data-amount={theDepositAmount.toFixed()}
+										data-native={Number(theToken.isNative)}
 										onClick={handleWithdraw}>withdraw</button>}
 								</div>
 							</div>

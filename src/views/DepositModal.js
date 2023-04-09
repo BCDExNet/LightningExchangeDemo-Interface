@@ -10,12 +10,13 @@ export const DepositModal = ({
 	secret = "",
 	deposited = "",
 	depositor = "",
-	beneficiary = ""
+	beneficiary = "",
+	native = false
 }) => {
 	useEffect(() => {
 		const cp = new ClipboardJS("#copyHashButton", {
 			text: () => {
-				return window.location.origin + "/deposit/" + secret
+				return window.location.origin + "/deposit/" + secret + "?native=" + Number(native)
 			}
 		});
 
