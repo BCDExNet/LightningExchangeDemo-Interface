@@ -1,6 +1,7 @@
 import Web3 from "web3";
 import { appConfig } from "../configs/appConfig";
 import { globalUtils } from "../libs/globalUtils";
+import BigNumber from "bignumber.js";
 
 export const web3Controller = {
 	_web3: null,
@@ -70,16 +71,31 @@ export const web3Controller = {
 		}
 	},
 
+	getBalance: async function () {
+		try {
+			return await this._web3.eth.getBalance(this.account);
+		} catch (error) {
+			console.error(error);
+			return "0";
+		}
+	},
+
 	callContract: async function (address, abi, method, ...args) {
 		return await this._makeContract(address, abi).methods[method](...args).call();
 	},
 
-	sendContract: async function (address, abi, method, doneCallback, cancelCallback, ...args) {
+	sendContract: async function (address, abi, method, doneCallback, cancelCallback, amount = null, ...args) {
 		const func = this._makeContract(address, abi).methods[method](...args);
 
 		let gas = 0;
+		const params = { from: this.account };
+
+		if (amount) {
+			params.value = BigNumber(amount).toFixed();
+		}
+
 		try {
-			gas = await func.estimateGas({ from: this.account });
+			gas = await func.estimateGas(params);
 		} catch (error) {
 			console.error(error);
 
@@ -95,10 +111,9 @@ export const web3Controller = {
 			}
 		}
 
-		func.send({
-			from: this.account,
-			gas
-		}).on('transactionHash', function (hash) {
+		params.gas = gas;
+
+		func.send(params).on('transactionHash', function (hash) {
 			if (doneCallback) doneCallback(hash);
 		}).on('confirmation', function (confirmationNumber, receipt) {
 			// 

@@ -50,7 +50,7 @@ export const C2CView = ({ data = null }) => {
 	// const handleChangeBTC = val => {
 	// 	const sat = appController.btc2sat(val);
 	// 	setBTCAmount(sat);
-	// 	setTokenAmount(appController.computeTokenWithBTC(sat, tokens[tokenToSellSelected].symbol, price));
+	// 	setTokenAmount(appController.computeTokenWithBTC(sat, theToken.symbol, price));
 	// 	// recomputeAmountToSell(tokenToSellSelected, sat);
 	// }
 
@@ -72,7 +72,7 @@ export const C2CView = ({ data = null }) => {
 				const sats = decoded.amount / 1000;
 
 				// recomputeAmountToSell(tokenToSellSelected, sats);
-				setTokenAmount(appController.computeTokenWithBTC(sats, tokens[tokenToSellSelected].symbol));
+				setTokenAmount(appController.computeTokenWithBTC(sats, theToken.symbol));
 				setBTCAmount(sats);
 				setSatFromInvoice(sats);
 				setExpiry(decoded.timeStamp + decoded.expiry + 3600);
@@ -94,7 +94,7 @@ export const C2CView = ({ data = null }) => {
 
 	const handleDeposit = () => {
 		appController.deposit(
-			tokens[tokenToSellSelected].symbol,
+			theToken.symbol,
 			tokenAmount.integerValue().toString(),
 			taker,
 			secretHash,
@@ -110,7 +110,8 @@ export const C2CView = ({ data = null }) => {
 					title: globalUtils.constants.SOMETHING_WRONG,
 					text: err.message.length < 100 ? err.message : globalUtils.constants.REVERTED_MESSAGE
 				});
-			}
+			},
+			theToken.isNative
 		);
 	};
 
@@ -124,10 +125,10 @@ export const C2CView = ({ data = null }) => {
 
 	const handleApprove = () => {
 		appController.approve(
-			tokens[tokenToSellSelected].symbol,
+			theToken.symbol,
 			() => {
 				setTimeout(() => {
-					if (tokenAmount.gt(0) && taker && invoice && !tokens[tokenToSellSelected].deficit && secretHash && expiry > 0) {
+					if (tokenAmount.gt(0) && taker && invoice && !theToken.deficit && secretHash && expiry > 0) {
 						handleDeposit();
 					}
 				}, 6000);
@@ -137,7 +138,7 @@ export const C2CView = ({ data = null }) => {
 
 	const updateTokenData = async index => {
 		const theToken = tokens[index];
-		const result = await appController.getDataWithToken(theToken.symbol);
+		const result = await appController.getDataWithToken(theToken.symbol, theToken.isNative);
 		theToken.allowance = result.allowance;
 		theToken.balance = result.balance;
 	};
@@ -223,20 +224,21 @@ export const C2CView = ({ data = null }) => {
 			onChange={handleChangeTaker}
 			placeholder="0x..." />
 
-		{tokens[tokenToSellSelected].allowance?.lt(tokenAmount) ? <button
+		{theToken.allowance?.lt(tokenAmount) ? <button
 			className="fullwidthButton"
 			onClick={handleApprove}
 			disabled={!data?.account}>Approve</button> : <button
 				className="fullwidthButton"
 				onClick={handleDeposit}
-				disabled={tokenAmount.eq(0) || !taker || !invoice || tokens[tokenToSellSelected].deficit}>Deposit</button>}
+				disabled={tokenAmount.eq(0) || !taker || !invoice || theToken.deficit}>Deposit</button>}
 
 		{showDepositModal && <DepositModal
 			onClose={handleCloseDepositModal}
 			secret={secretHash}
-			deposited={tokenAmount.shiftedBy(-tokens[tokenToSellSelected].decimals).toFixed(appConfig.fraction)}
+			deposited={tokenAmount.shiftedBy(-theToken.decimals).toFixed(appConfig.fraction)}
 			depositor={appController.shortenString(data?.account, 4, 4)}
-			beneficiary={appController.shortenString(taker, 4, 4)} />}
+			beneficiary={appController.shortenString(taker, 4, 4)}
+			native={theToken.isNative} />}
 
 		{error && <MessageModal
 			title={error.title}

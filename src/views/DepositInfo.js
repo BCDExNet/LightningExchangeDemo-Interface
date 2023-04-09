@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { toCanvas } from "qrcode";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { KeyAndValueInLine } from "../components/KeyAndValueInLine";
 import { SecretHashLabel } from "../components/SecretHashLabel";
 import { StringInput } from "../components/StringInput";
@@ -14,6 +14,8 @@ import "./DepositInfo.css";
 
 const DepositInfo = ({ chainId = 0 }) => {
 	const { secret } = useParams();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const native = Boolean(parseInt(searchParams.get("native")));
 	const [data, setData] = useState(null);
 	const [preimage, setPreimage] = useState("");
 	const [amountInInvoice, setAmountInInvoice] = useState(0);
@@ -21,7 +23,13 @@ const DepositInfo = ({ chainId = 0 }) => {
 
 	useEffect(() => {
 		if (chainId > 0 && data) {
-			setTheToken(Object.values(appConfig.exchanges[chainId].tokens).find(item => item.address.toLocaleLowerCase() === data.token.toLocaleLowerCase()));
+			setTheToken(Object.values(appConfig.exchanges[chainId].tokens).find(item => {
+				if (data.token) {
+					return item.address?.toLocaleLowerCase() === data.token?.toLocaleLowerCase()
+				} else {
+					return item.isNative;
+				}
+			}));
 		}
 	}, [chainId, data]);
 
@@ -36,7 +44,7 @@ const DepositInfo = ({ chainId = 0 }) => {
 
 	useEffect(() => {
 		const getData = async () => {
-			const result = await appController.getDepositInfo(secret);
+			const result = await appController.getDepositInfo(secret, native);
 
 			setData(result);
 
@@ -69,7 +77,9 @@ const DepositInfo = ({ chainId = 0 }) => {
 			preimage,
 			() => {
 				window.alert("Withdrawn!");
-			}
+			},
+			null,
+			native
 		);
 	};
 

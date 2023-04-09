@@ -43,7 +43,7 @@ export const appController = {
 		}
 	},
 
-	getDataWithToken: async function (token) {
+	getDataWithToken: async function (token, isNative) {
 		if (!this._account) {
 			return {
 				allowance: globalUtils.constants.BIGNUMBER_ZERO,
@@ -51,10 +51,17 @@ export const appController = {
 			};
 		}
 
-		const tokenConfig = this._config.tokens[token];
-		const erc20Abi = await this._loadJson(tokenConfig.abi);
-		const allowance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "allowance", this._account, this._config.safeBox.address);
-		const balance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "balanceOf", this._account);
+		let allowance = "";
+		let balance = "";
+		if (isNative) {
+			allowance = globalUtils.constants.MAX_BIGNUMBER_STRING;
+			balance = await web3Controller.getBalance();
+		} else {
+			const tokenConfig = this._config.tokens[token];
+			const erc20Abi = await this._loadJson(tokenConfig.abi);
+			allowance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "allowance", this._account, this._config.safeBox.address);
+			balance = await web3Controller.callContract(tokenConfig.address, erc20Abi, "balanceOf", this._account);
+		}
 
 		return {
 			allowance: BigNumber(allowance),
@@ -68,6 +75,7 @@ export const appController = {
 		let i = 0;
 		const orders = [];
 		const safeBoxAbi = await this._loadJson(this._config.safeBox.abi);
+		const safeBoxNativeAbi = await this._loadJson(this._config.safeBoxNative.abi);
 
 		if (this._account) {
 			let howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getDepositorHashLength", this._account);
@@ -80,11 +88,33 @@ export const appController = {
 			}
 
 			i = 0;
+			howManyOrder = await web3Controller.callContract(this._config.safeBoxNative.address, safeBoxNativeAbi, "getDepositorHashLength", this._account);
+			while (i < howManyOrder) {
+				orders.push({
+					hash: await web3Controller.callContract(this._config.safeBoxNative.address, safeBoxNativeAbi, "getDepositorHashByIndex", this._account, i),
+					sent: true,
+					native: true
+				});
+				i++;
+			}
+
+			i = 0;
 			howManyOrder = await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashLength", this._account);
 			while (i < howManyOrder) {
 				orders.push({
 					hash: await web3Controller.callContract(this._config.safeBox.address, safeBoxAbi, "getWithdrawerHashByIndex", this._account, i),
 					sent: false
+				});
+				i++;
+			}
+
+			i = 0;
+			howManyOrder = await web3Controller.callContract(this._config.safeBoxNative.address, safeBoxNativeAbi, "getWithdrawerHashLength", this._account);
+			while (i < howManyOrder) {
+				orders.push({
+					hash: await web3Controller.callContract(this._config.safeBoxNative.address, safeBoxNativeAbi, "getWithdrawerHashByIndex", this._account, i),
+					sent: false,
+					native: true
 				});
 				i++;
 			}
@@ -132,56 +162,77 @@ export const appController = {
 			"approve",
 			doneCallback,
 			cancelCallback,
+			null,
 			this._config.safeBox.address,
 			new BigNumber(2).pow(256).minus(1).toFixed()
 		);
 	},
 
-	deposit: async function (token, amount, beneficiary, secretHash, deadline, invoice, doneCallback, cancelCallback) {
-		const abi = await this._loadJson(this._config.safeBox.abi);
-		web3Controller.sendContract(
-			this._config.safeBox.address,
-			abi,
-			"deposit",
-			doneCallback,
-			cancelCallback,
-			this._config.tokens[token].address,
-			amount,
-			beneficiary,
-			secretHash,
-			deadline,
-			invoice
-		);
+	deposit: async function (token, amount, beneficiary, secretHash, deadline, invoice, doneCallback, cancelCallback, isNative) {
+		let abi = null;
+		if (isNative) {
+			abi = await this._loadJson(this._config.safeBoxNative.abi);
+			web3Controller.sendContract(
+				this._config.safeBoxNative.address,
+				abi,
+				"deposit",
+				doneCallback,
+				cancelCallback,
+				amount,
+				beneficiary,
+				secretHash,
+				deadline,
+				invoice
+			);
+		} else {
+			abi = await this._loadJson(this._config.safeBox.abi);
+			web3Controller.sendContract(
+				this._config.safeBox.address,
+				abi,
+				"deposit",
+				doneCallback,
+				cancelCallback,
+				null,
+				this._config.tokens[token].address,
+				amount,
+				beneficiary,
+				secretHash,
+				deadline,
+				invoice
+			);
+		}
 	},
 
-	withdraw: async function (preimage, doneCallback, cancelCallback) {
-		const abi = await this._loadJson(this._config.safeBox.abi);
+	withdraw: async function (preimage, doneCallback, cancelCallback, native) {
+		const abi = await this._loadJson(native ? this._config.safeBoxNative.abi : this._config.safeBox.abi);
 		web3Controller.sendContract(
-			this._config.safeBox.address,
+			native ? this._config.safeBoxNative.address : this._config.safeBox.address,
 			abi,
 			"withdraw",
 			doneCallback,
 			cancelCallback,
+			null,
 			preimage
 		);
 	},
 
-	refund: async function (secret, doneCallback, cancelCallback) {
-		const abi = await this._loadJson(this._config.safeBox.abi);
+	refund: async function (secret, doneCallback, cancelCallback, native) {
+		const abi = await this._loadJson(native ? this._config.safeBoxNative.abi : this._config.safeBox.abi);
 		web3Controller.sendContract(
-			this._config.safeBox.address,
+			native ? this._config.safeBoxNative.address : this._config.safeBox.address,
 			abi,
 			"refund",
 			doneCallback,
 			cancelCallback,
+			null,
 			secret
 		);
 	},
 
-	getDepositInfo: async function (secret) {
-		const abi = await this._loadJson(this._config.safeBox.abi);
+	getDepositInfo: async function (secret, isNative) {
+		let abi = await this._loadJson(isNative ? this._config.safeBoxNative.abi : this._config.safeBox.abi);
 		const result = await web3Controller.callContract(
-			this._config.safeBox.address,
+			isNative ? this._config.safeBoxNative.address : this._config.safeBox.address,
 			abi,
 			"getDeposit",
 			secret

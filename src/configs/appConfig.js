@@ -3,7 +3,7 @@ export const appConfig = {
 	fee: 100,
 	btcLimit: 50000,
 	updateDurationMS: 600000,
-	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin",
+	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin,elastos,ethereum",
 	defaultNetwork: "bsc",
 	networks: {
 		bsc: {
@@ -68,11 +68,22 @@ export const appConfig = {
 					abi: "/abis/erc20.json",
 					decimals: 6,
 					logo: "/images/usdc.png"
+				},
+				ela: {
+					isNative: true,
+					name: "ELA",
+					decimals: 18,
+					logo: "/images/ela.svg"
 				}
 			},
 			safeBox: {
-				address: "0xdEF092bC601cEcccAd596268b841B42306273970",
+				// address: "0xdEF092bC601cEcccAd596268b841B42306273970",
+				address: "0xcCfC09e473911820639e5DD3c71987fD0597eec0",
 				abi: "/abis/safe_box.json"
+			},
+			safeBoxNative: {
+				address: "0x23DafbC321dEEEcd3Efdf3fA7593C8d33dcbac11",
+				abi: "/abis/LightningSwapNative.json"
 			}
 		},
 		"56": {
@@ -98,11 +109,21 @@ export const appConfig = {
 					abi: "/abis/erc20.json",
 					decimals: 18,
 					logo: "/images/btc.png"
+				},
+				bnb: {
+					isNative: true,
+					name: "BNB",
+					decimals: 18,
+					logo: "/images/bnb.png"
 				}
 			},
 			safeBox: {
 				address: "0xd1a9559D4D54Ae11ad5ceBa1b309484502f4575d",
 				abi: "/abis/safe_box.json"
+			},
+			safeBoxNative: {
+				address: "0x316a4B704cbb793d16b7DF228805F49beeb040c5",
+				abi: "/abis/LightningSwapNative.json"
 			}
 		},
 		"42161": {
@@ -128,11 +149,21 @@ export const appConfig = {
 					abi: "/abis/erc20.json",
 					decimals: 8,
 					logo: "/images/btc.png"
+				},
+				eth: {
+					isNative: true,
+					name: "ETH",
+					decimals: 18,
+					logo: "/images/eth.svg"
 				}
 			},
 			safeBox: {
 				address: "0xB5a90265631efECF6e4B4F23C23f4B7367839D63",
 				abi: "/abis/safe_box.json"
+			},
+			safeBoxNative: {
+				address: "0xeDF9AE3Dfa601ec70085ed7c898D0553b6450F08",
+				abi: "/abis/LightningSwapNative.json"
 			}
 		}
 	}
