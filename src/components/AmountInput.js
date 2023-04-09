@@ -28,7 +28,7 @@ export const AmountInput = ({
 	};
 
 	useEffect(() => {
-		if (valueForced > 0) {
+		if (valueForced >= 0) {
 			setValue(valueForced)
 		}
 	}, [valueForced]);
