@@ -36,8 +36,9 @@ export const B2CView = ({ data = null }) => {
 		if (sats > 0) {
 			howMuchToken = appController.computeTokenWithBTC(sats, theToken.symbol);
 		}
-		theToken.value = howMuchToken.shiftedBy(-theToken.decimals).toFixed();
+		theToken.value = howMuchToken.shiftedBy(-theToken.decimals);
 		theToken.deficit = howMuchToken.gt(theToken.balance);
+		theToken.fee = appController.computeTokenWithBTC(appConfig.fee, theToken.symbol).shiftedBy(-theToken.decimals);
 
 		setTokenAmount(howMuchToken.integerValue());
 	};

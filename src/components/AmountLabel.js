@@ -56,9 +56,9 @@ export const AmountLabel = ({
 			<div
 				className="values"
 				style={{ color: theToken?.deficit ? "red" : "" }}>
-				<div>{theToken?.value ?? 0}</div>
+				<div>{theToken?.fee ? (theToken.value.minus(theToken.fee).toFixed() + " + " + theToken.fee.toFixed() + "(fee)") : (theToken?.value ? theToken.value.toFixed() : 0)}</div>
 
-				<div className="subValue">{theToken?.value ? BigNumber(theToken?.value).multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed() : 0}&nbsp;USD</div>
+				<div className="subValue">{theToken?.value ? theToken?.value.multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed() : 0}&nbsp;USD</div>
 			</div>
 		</div>
 	</div>
