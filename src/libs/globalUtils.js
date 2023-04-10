@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { appConfig } from "../configs/appConfig";
 
 export const globalUtils = {
 	constants: {
@@ -18,5 +19,47 @@ export const globalUtils = {
 		ERROR: 0,
 		INFO: 1,
 		DONE: 2
+	},
+	timeDiff: end => {
+		const now = new Date().getTime() / 1000;
+
+		let diff = end - now;
+		if (diff <= 0) {
+			return 0;
+		}
+
+		let days = Math.trunc(diff / 86400);
+		let hours = Math.trunc((diff - (86400 * days)) / 3600);
+		let minutes = Math.trunc((diff - (days * 86400 + hours * 3600)) / 60);
+		let seconds = Math.trunc(diff - (days * 86400 + hours * 3600 + minutes * 60));
+
+		let diffString = '';
+
+		if (days) {
+			diffString += `${days}d`;
+		}
+
+		if (hours) {
+			diffString += ` ${hours}h`;
+		}
+
+		if (minutes) {
+			diffString += ` ${minutes}m`;
+		}
+
+		if (seconds) {
+			diffString += ` ${seconds}s`;
+		}
+
+		return diffString;
+	},
+	formatBigNumber: (num, fraction = appConfig.fraction) => {
+		if (isNaN(num) || !num) {
+			console.warn(num);
+			return "0";
+		}
+
+		const n = (typeof num) === "number" ? num : num.toNumber();
+		return n.toLocaleString("en-US", { maximumFractionDigits: fraction })
 	}
 };

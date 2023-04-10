@@ -4,6 +4,8 @@ import { Select } from "./Select";
 import { Tooltip } from "./Tooltip";
 import { appController } from "../libs/appController";
 import BigNumber from "bignumber.js";
+import { appConfig } from "../configs/appConfig";
+import { globalUtils } from "../libs/globalUtils";
 
 export const AmountLabel = ({
 	title = "",
@@ -56,9 +58,9 @@ export const AmountLabel = ({
 			<div
 				className="values"
 				style={{ color: theToken?.deficit ? "red" : "" }}>
-				<div>{theToken?.fee ? (theToken.value.minus(theToken.fee).toFixed() + " + " + theToken.fee.toFixed() + "(fee)") : (theToken?.value ? theToken.value.toFixed() : 0)}</div>
+				<div>{theToken?.fee && theToken?.value.gt(0) ? (globalUtils.formatBigNumber(theToken.value.minus(theToken.fee)) + " + " + globalUtils.formatBigNumber(theToken.fee) + "(fee)") : (theToken?.value ? globalUtils.formatBigNumber(theToken.value) : 0)}</div>
 
-				<div className="subValue">{theToken?.value ? theToken?.value.multipliedBy(appController.getTokenPrice(theToken?.symbol)).toFixed() : 0}&nbsp;USD</div>
+				<div className="subValue">{theToken?.value ? globalUtils.formatBigNumber(theToken?.value.multipliedBy(appController.getTokenPrice(theToken?.symbol))) : 0}&nbsp;USD</div>
 			</div>
 		</div>
 	</div>
