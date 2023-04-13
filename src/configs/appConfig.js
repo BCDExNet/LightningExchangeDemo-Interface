@@ -3,7 +3,7 @@ export const appConfig = {
 	fee: 100,
 	btcLimit: 50000,
 	updateDurationMS: 600000,
-	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin,elastos,ethereum,kucoin-shares,rei-network,iotex",
+	priceApi: "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=250&sparkline=false&page=1&ids=bitcoin,usd-coin,binance-usd,binance-bitcoin,tether,binancecoin,wrapped-bitcoin,elastos,ethereum,kucoin-shares,rei-network,iotex,filda,huobi-token",
 	defaultNetwork: "bsc",
 	networks: {
 		bsc: {
@@ -18,19 +18,6 @@ export const appConfig = {
 			},
 			blockExplorerUrls: ["https://bscscan.com/"],
 			iconUrls: ["/images/bsc.svg"]
-		},
-		elastos: {
-			chainName: "Elastos",
-			chain: "ESC",
-			chainId: 20,
-			rpcUrls: ["https://api.elastos.io/esc"],
-			nativeCurrency: {
-				name: "ELA",
-				symbol: "ELA",
-				decimals: 18
-			},
-			blockExplorerUrls: ["https://eth.elastos.io/"],
-			iconUrls: ["/images/esc.svg"]
 		},
 		arbitrum: {
 			chainName: "Arbitrum",
@@ -58,6 +45,32 @@ export const appConfig = {
 			blockExplorerUrls: ["https://explorer.kcc.io"],
 			iconUrls: ["/images/header-network-kcc.svg"]
 		},
+		iotex: {
+			chainName: "IoTeX",
+			chain: "IoTeX",
+			chainId: 4689,
+			rpcUrls: ["https://babel-api.mainnet.iotex.io"],
+			nativeCurrency: {
+				name: "IOTX",
+				symbol: "IOTX",
+				decimals: 18
+			},
+			blockExplorerUrls: ["https://iotexscan.io"],
+			iconUrls: ["/images/header-network-iotex.svg"]
+		},
+		heco: {
+			chainName: "Heco",
+			chain: "Heco",
+			chainId: 128,
+			rpcUrls: ["https://http-mainnet.hecochain.com"],
+			nativeCurrency: {
+				name: "HT",
+				symbol: "HT",
+				decimals: 18
+			},
+			blockExplorerUrls: ["https://hecoinfo.com"],
+			iconUrls: ["/images/heco.png"]
+		},
 		rei: {
 			chainName: "REI",
 			chain: "REI",
@@ -71,21 +84,47 @@ export const appConfig = {
 			blockExplorerUrls: ["https://scan.rei.network"],
 			iconUrls: ["/images/rei.svg"]
 		},
-		iotex: {
-			chainName: "IoTeX",
-			chain: "IoTeX",
-			chainId: 4689,
-			rpcUrls: ["https://babel-api.mainnet.iotex.io"],
+		elastos: {
+			chainName: "Elastos",
+			chain: "ESC",
+			chainId: 20,
+			rpcUrls: ["https://api.elastos.io/esc"],
 			nativeCurrency: {
-				name: "IOTX",
-				symbol: "IOTX",
+				name: "ELA",
+				symbol: "ELA",
 				decimals: 18
 			},
-			blockExplorerUrls: ["https://iotexscan.io"],
-			iconUrls: ["/images/header-network-iotex.svg"]
+			blockExplorerUrls: ["https://eth.elastos.io/"],
+			iconUrls: ["/images/esc.svg"]
 		}
 	},
 	exchanges: {
+		"128": {
+			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
+			tokens: {
+				filda: {
+					name: "Filda",
+					address: "0xe36ffd17b2661eb57144ceaef942d95295e637f0",
+					abi: "/abis/erc20.json",
+					decimals: 18,
+					logo: "/images/filda.png"
+				},
+				ht: {
+					isNative: true,
+					name: "Huobi Token",
+					decimals: 18,
+					logo: "/images/ht.png"
+				}
+			},
+			safeBox: {
+				address: "0x8D749aAA1C940a96142F544698E14Cc7375Ccce1",
+				abi: "/abis/safe_box.json"
+			},
+			safeBoxNative: {
+				address: "0xF2ab663f62821038357Aa770dB30Dbdf5855B63E",
+				abi: "/abis/LightningSwapNative.json"
+			}
+		},
 		"20": {
 			b2cTaker: "0xf495e080adcc153579423a3860801a4e282b26f2",
 			tokens: {
@@ -104,7 +143,6 @@ export const appConfig = {
 				}
 			},
 			safeBox: {
-				// address: "0xdEF092bC601cEcccAd596268b841B42306273970",
 				address: "0xcCfC09e473911820639e5DD3c71987fD0597eec0",
 				abi: "/abis/safe_box.json"
 			},
