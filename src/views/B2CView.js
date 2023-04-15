@@ -163,7 +163,7 @@ export const B2CView = ({ data = null }) => {
 		<div className="subViewLayout">
 			<StringInput
 				title="Invoice"
-				tooltip="Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID."
+				tooltip={<>Generate an invoice in a wallet that supports the lighting network, then scan it or paste it's ID.<br /><a href="https://youtu.be/5gQNeiWz304" target="_blank" rel="noreferrer">click for details</a></>}
 				onChange={handleChangeInvoice}
 				placeholder="lnbc1..."
 				qr={true}
