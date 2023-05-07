@@ -3,9 +3,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: black;
-  background-image: url("./assets/images/bg.png");
+  background-image: url("./assets/images/bg1.png");
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center;
   color: gainsboro;
   padding: 0;
   display: flex;

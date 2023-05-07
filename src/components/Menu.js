@@ -43,6 +43,13 @@ export const Menu = () => {
 			onMouseEnter={clearTimer}
 			onMouseLeave={handleMouseOut}>
 			<LinkWithIcon
+				icon="/images/play.png"
+				label="Watch Walkthrough"
+				url="https://youtu.be/5gQNeiWz304"
+				onClick={handleClick}
+				fullWidth />
+
+			<LinkWithIcon
 				icon="/images/docs.png"
 				label="docs"
 				url="https://docs.bcdex.net"
