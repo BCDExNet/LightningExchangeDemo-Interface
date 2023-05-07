@@ -19,7 +19,7 @@ export const Header = ({
 		<div className="menu">
 			<img
 				src="/images/logo.png"
-				height="26px"
+				height="40px"
 				alt="logo" />
 		</div>
 
